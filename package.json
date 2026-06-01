@@ -1,0 +1,34 @@
+{
+  "name": "@lijuhong1981/instancedsprite",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "module": "index.js",
+  "main": "index.js",
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "docs": "jsdoc2md --files src/*.js > API.md"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lijuhong1981/threeInstancedSprite.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/lijuhong1981/threeInstancedSprite/issues"
+  },
+  "homepage": "https://github.com/lijuhong1981/threeInstancedSprite#readme",
+  "dependencies": {
+    "@lijuhong1981/jslibs": "^1.4.25",
+    "@lijuhong1981/three.utils": "^1.0.3",
+    "three": ">=0.171.0"
+  },
+  "devDependencies": {
+    "jsdoc-to-markdown": "^9.1.3"
+  }
+}
