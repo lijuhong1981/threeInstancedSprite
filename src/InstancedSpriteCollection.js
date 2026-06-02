@@ -26,8 +26,19 @@ const imageCache = new Map();
  * @extends Object3D
  */
 class InstancedSpriteCollection extends Object3D {
-    constructor() {
+    /**
+     * @param {boolean} [useNodeMaterial=false] - 是否使用TSL的NodeMaterial，默认false
+     * @constructor
+    */
+    constructor(useNodeMaterial = false) {
         super();
+        /**
+         * 是否使用TSL的NodeMaterial，默认false
+         * @type {boolean}
+         * @readonly
+         * @default false
+        */
+        this.useNodeMaterial = useNodeMaterial;
         /**
          * 对象类型标识
          * @type {string}
@@ -196,7 +207,7 @@ class InstancedSpriteCollection extends Object3D {
         for (const mesh of meshes) {
             mesh.raycast(raycaster, intersects);
         }
-    }    
+    }
     /**
      * 每帧更新
      * @private
