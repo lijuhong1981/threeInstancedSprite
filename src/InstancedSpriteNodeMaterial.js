@@ -34,7 +34,7 @@ class InstancedSpriteNodeMaterial extends NodeMaterial {
         this.lights = false;
 
         // 纹理 Uniform 节点（可延迟赋值，使用空纹理保证节点类型稳定）
-        this._textureNode = uniformTexture(new Texture());
+        this._textureNode = uniformTexture();
 
         this._setupShader();
     }
