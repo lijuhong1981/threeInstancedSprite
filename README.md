@@ -15,11 +15,14 @@ import { InstancedSpriteCollection } from "@lijuhong1981/instancedsprite";
 ...
 // 初始化
 const collection = new InstancedSpriteCollection();
+// 如果使用的是WebGPURenderer，请添加参数true，以启用TSL的NodeMaterial
+// const collection = new InstancedSpriteCollection(true);
 ...
 // 动画帧更新
 const onAnimate = () => {
     window.requestAnimationFrame(onAnimate);
     ...
+    // 每帧更新
     collection.update();
 };
 // 添加
