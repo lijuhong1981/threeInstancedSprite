@@ -5,7 +5,7 @@ three自带的Sprite并不支持GPU Instancing，当遇到需要在场景中大�
 ## 安装
 
 ```bash
-npm install @lijuhong1981/instancedsprite
+npm install @lijuhong1981/three.instancedsprite
 ```
 
 ## 使用
