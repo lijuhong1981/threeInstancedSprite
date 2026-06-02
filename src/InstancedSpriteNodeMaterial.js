@@ -1,14 +1,5 @@
+import { attribute, cameraProjectionMatrix, cos, Discard, float, Fn, If, modelViewMatrix, positionGeometry, sin, texture, uniformTexture, uv, varying, vec2, vec4, } from 'three/tsl';
 import { NodeMaterial, Texture } from 'three/webgpu';
-import {
-    attribute, texture, uniformTexture,
-    varying,
-    vec4, vec2, float,
-    sin, cos,
-    Fn, If,
-    Discard,
-    modelViewMatrix, cameraProjectionMatrix,
-    positionGeometry, uv,
-} from 'three/tsl';
 
 /**
  * InstancedSpriteNodeMaterial 材质类，基于 Three.js TSL (Three Shading Language) 语法实现
