@@ -27,7 +27,7 @@
 ## Constants
 
 <dl>
-<dt><a href="#scratchVector2">scratchVector2</a></dt>
+<dt><a href="#imageLoader">imageLoader</a></dt>
 <dd></dd>
 </dl>
 
@@ -69,8 +69,11 @@ InstancedSprite 数据模型类，用于存储单个 InstancedSprite 的所有�
     * [.imageId](#InstancedSprite+imageId) : <code>string</code>
     * [.imageWidth](#InstancedSprite+imageWidth) : <code>number</code>
     * [.imageHeight](#InstancedSprite+imageHeight) : <code>number</code>
+    * [.geometry](#InstancedSprite+geometry) : <code>InstancedBufferGeometry</code>
+    * [.material](#InstancedSprite+material) : [<code>InstancedSpriteMaterial</code>](#InstancedSpriteMaterial)
     * [.setValues(options)](#InstancedSprite+setValues) ⇒ [<code>InstancedSprite</code>](#InstancedSprite)
     * [.remove()](#InstancedSprite+remove) ⇒ [<code>InstancedSprite</code>](#InstancedSprite)
+    * [.raycast(raycaster, intersects, modelViewMatrix)](#InstancedSprite+raycast)
 
 <a name="new_InstancedSprite_new"></a>
 
@@ -196,6 +199,20 @@ InstancedSprite对象标识
 
 **Kind**: instance property of [<code>InstancedSprite</code>](#InstancedSprite)  
 **Read only**: true  
+<a name="InstancedSprite+geometry"></a>
+
+### instancedSprite.geometry : <code>InstancedBufferGeometry</code>
+InstancedSprite对象的几何体属性
+
+**Kind**: instance property of [<code>InstancedSprite</code>](#InstancedSprite)  
+**Read only**: true  
+<a name="InstancedSprite+material"></a>
+
+### instancedSprite.material : [<code>InstancedSpriteMaterial</code>](#InstancedSpriteMaterial)
+InstancedSprite对象的材质属性
+
+**Kind**: instance property of [<code>InstancedSprite</code>](#InstancedSprite)  
+**Read only**: true  
 <a name="InstancedSprite+setValues"></a>
 
 ### instancedSprite.setValues(options) ⇒ [<code>InstancedSprite</code>](#InstancedSprite)
@@ -213,6 +230,19 @@ InstancedSprite对象标识
 从Mesh中移除该InstancedSprite对象
 
 **Kind**: instance method of [<code>InstancedSprite</code>](#InstancedSprite)  
+<a name="InstancedSprite+raycast"></a>
+
+### instancedSprite.raycast(raycaster, intersects, modelViewMatrix)
+Computes intersection points between a casted ray and this sprite.
+
+**Kind**: instance method of [<code>InstancedSprite</code>](#InstancedSprite)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| raycaster | <code>Raycaster</code> | The raycaster. |
+| intersects | <code>Array.&lt;Object&gt;</code> | The target array that holds the intersection points. |
+| modelViewMatrix | <code>Matrix4</code> |  |
+
 <a name="InstancedSpriteCollection"></a>
 
 ## InstancedSpriteCollection ⇐ <code>Object3D</code>
@@ -237,6 +267,7 @@ InstancedSpriteCollection类，批量管理InstancedSprite实例
     * [.add()](#InstancedSpriteCollection+add) ⇒ [<code>InstancedSprite</code>](#InstancedSprite)
     * [.remove(sprite)](#InstancedSpriteCollection+remove) ⇒ [<code>InstancedSpriteCollection</code>](#InstancedSpriteCollection)
     * [.forEach(callback)](#InstancedSpriteCollection+forEach) ⇒ [<code>InstancedSpriteCollection</code>](#InstancedSpriteCollection)
+    * [.raycast(raycaster, intersects)](#InstancedSpriteCollection+raycast)
 
 <a name="InstancedSpriteCollection+type"></a>
 
@@ -333,6 +364,18 @@ InstancedSprite实例数量
 | --- | --- |
 | callback | <code>function</code> | 
 
+<a name="InstancedSpriteCollection+raycast"></a>
+
+### instancedSpriteCollection.raycast(raycaster, intersects)
+Computes intersection points between a casted ray and this sprite.
+
+**Kind**: instance method of [<code>InstancedSpriteCollection</code>](#InstancedSpriteCollection)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| raycaster | <code>Raycaster</code> | The raycaster. |
+| intersects | <code>Array.&lt;Object&gt;</code> | The target array that holds the intersection points. |
+
 <a name="InstancedSpriteMaterial"></a>
 
 ## InstancedSpriteMaterial ⇐ <code>ShaderMaterial</code>
@@ -363,6 +406,7 @@ InstancedSpriteMesh类，基于InstancedBufferGeometry实现的高性能Instance
     * [.add(sprite)](#InstancedSpriteMesh+add) ⇒ [<code>InstancedSpriteMesh</code>](#InstancedSpriteMesh)
     * [.remove(sprite)](#InstancedSpriteMesh+remove) ⇒ [<code>InstancedSpriteMesh</code>](#InstancedSpriteMesh)
     * [.clear()](#InstancedSpriteMesh+clear) ⇒ [<code>InstancedSpriteMesh</code>](#InstancedSpriteMesh)
+    * [.raycast(raycaster, intersects)](#InstancedSpriteMesh+raycast)
 
 <a name="new_InstancedSpriteMesh_new"></a>
 
@@ -429,12 +473,25 @@ InstancedSprite对象数组
 移除所有InstancedSprite
 
 **Kind**: instance method of [<code>InstancedSpriteMesh</code>](#InstancedSpriteMesh)  
-<a name="scratchVector2"></a>
+<a name="InstancedSpriteMesh+raycast"></a>
 
-## scratchVector2
+### instancedSpriteMesh.raycast(raycaster, intersects)
+Computes intersection points between a casted ray and this sprite.
+
+**Kind**: instance method of [<code>InstancedSpriteMesh</code>](#InstancedSpriteMesh)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| raycaster | <code>Raycaster</code> | The raycaster. |
+| intersects | <code>Array.&lt;Object&gt;</code> | The target array that holds the intersection points. |
+
+<a name="imageLoader"></a>
+
+## imageLoader
 **Kind**: global constant  
 **Import**: InstancedSpriteCollection from "./InstancedSpriteCollection.js";  
 **Import**: InstancedSpriteMesh from "./InstancedSpriteMesh.js";  
+**Import**: InstancedSpriteMaterial from "./InstancedSpriteMaterial.js";  
 <a name="InstancedSpriteOptions"></a>
 
 ## InstancedSpriteOptions : <code>object</code>
@@ -449,7 +506,7 @@ InstancedSprite 对象配置项选项
 | [position] | <code>Vector3</code> \| <code>Array.&lt;number&gt;</code> | <code>(0,0,0)</code> | 位置（世界空间） |
 | [scale] | <code>number</code> | <code>1</code> | 缩放 |
 | [rotation] | <code>number</code> | <code>0</code> | 旋转（弧度） |
-| [sizeAttenuation] | <code>boolean</code> | <code>false</code> | 尺寸是否跟随相机深度变化 |
+| [sizeAttenuation] | <code>boolean</code> | <code>true</code> | 尺寸是否跟随相机深度变化 |
 | [center] | <code>Vector2</code> \| <code>Array.&lt;number&gt;</code> | <code>(0.5,0.5)</code> | 锚点中心（0-1） |
 | [color] | <code>Color</code> \| <code>number</code> \| <code>string</code> | <code>0xffffff</code> | 颜色 |
 | [opacity] | <code>number</code> | <code>1</code> | 不透明度（0-1） |

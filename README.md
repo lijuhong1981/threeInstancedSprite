@@ -41,6 +41,12 @@ sprite.remove();
 // collection.remove(sprite);
 // 清空
 collection.clear();
+// 射线检测
+raycaster.setFromCamera(ndc, camera)
+const intersects = raycaster.intersectObject(collection);
+if (intersects.length > 0) {
+    const pickedSprite = intersects[0].object; //拾取到的InstancedSprite对象
+}
 ```
 
 ## [API文档](./API.md)

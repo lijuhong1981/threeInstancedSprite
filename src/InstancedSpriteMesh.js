@@ -1,7 +1,7 @@
 import Check from "@lijuhong1981/jscheck/src/Check.js";
-import { BufferAttribute, InstancedBufferGeometry, InstancedBufferAttribute, Mesh, Texture } from "three";
-import InstancedSpriteMaterial from "./InstancedSpriteMaterial.js";
+import { BufferAttribute, InstancedBufferAttribute, InstancedBufferGeometry, Mesh, Raycaster, Texture } from "three";
 import InstancedSprite from "./InstancedSprite.js";
+import InstancedSpriteMaterial from "./InstancedSpriteMaterial.js";
 
 /**
  * @import InstancedSpriteCollection from "./InstancedSpriteCollection.js";
@@ -245,7 +245,7 @@ class InstancedSpriteMesh extends Mesh {
     */
     get depthTest() { return this.material.depthTest; }
     set depthTest(value) {
-        Check.typeOf.boolean(value, 'depthTest');
+        Check.typeOf.boolean('depthTest', value);
         this.material.depthTest = value;
     }
     /**
@@ -315,6 +315,26 @@ class InstancedSpriteMesh extends Mesh {
         this._instancedSprites.length = 0;
         this.geometry.instanceCount = 0;
         return this;
+    }
+    /**
+     * Computes intersection points between a casted ray and this sprite.
+     *
+     * @param {Raycaster} raycaster - The raycaster.
+     * @param {Array<Object>} intersects - The target array that holds the intersection points.
+     */
+    raycast(raycaster, intersects) {
+
+        if (raycaster.camera === null) {
+
+            console.error('InstancedSpriteMesh: "Raycaster.camera" needs to be set in order to raycast against sprites.');
+            return;
+
+        }
+
+        const sprites = this._instancedSprites;
+        for (const sprite of sprites) {
+            sprite.raycast(raycaster, intersects, raycaster.camera.matrixWorldInverse);
+        }
     }
     /**
      * 每帧更新

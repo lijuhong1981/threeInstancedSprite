@@ -186,6 +186,18 @@ class InstancedSpriteCollection extends Object3D {
         return this;
     }
     /**
+     * Computes intersection points between a casted ray and this sprite.
+     *
+     * @param {Raycaster} raycaster - The raycaster.
+     * @param {Array<Object>} intersects - The target array that holds the intersection points.
+     */
+    raycast(raycaster, intersects) {
+        const meshes = this._meshes.values();
+        for (const mesh of meshes) {
+            mesh.raycast(raycaster, intersects);
+        }
+    }    
+    /**
      * 每帧更新
      * @private
      */

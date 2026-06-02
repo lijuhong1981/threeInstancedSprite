@@ -26,7 +26,6 @@ void main() {
     float sizeAttenuation = aScaleAndRotationAndSizeAttenuation.z;
     vec2 center = aCenterAndSize.xy;
     vec2 imageSize = aCenterAndSize.zw;
-    float aspectRatio = imageSize.x / imageSize.y;
 
     // --- 2. 输出varying变量 ---
     vShow = show;
@@ -34,7 +33,8 @@ void main() {
     vColorAndOpacity = aColorAndOpacity;
 
     // --- 3. 提前隐藏不可见物体（顶点级丢弃，性能最优）---
-    if (show < 0.5) {
+    if (show < 0.5 || imageSize.x <= 0.0 || imageSize.y <= 0.0) {
+        vShow = 0.0;
         gl_Position = vec4(0.0, 0.0, 2.0, 1.0);
         return;
     }
@@ -51,12 +51,13 @@ void main() {
     }
 
     // --- 6. sizeAttenuation检查：大小跟随深度
-    if (sizeAttenuation > 0.5) {
+    if (sizeAttenuation < 0.5) {
         bool isPerspective = isPerspectiveMatrix( projectionMatrix );
 		if ( isPerspective ) scale *= depth;
     }
 
     // --- 7. 坐标对齐
+    float aspectRatio = imageSize.x / imageSize.y;
     vec2 alignedPosition = ( position.xy - ( center - vec2( 0.5 ) ) ) * aspectRatio * scale;
 
     // --- 8. 计算旋转
