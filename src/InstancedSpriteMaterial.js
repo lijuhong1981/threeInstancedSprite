@@ -124,7 +124,6 @@ class InstancedSpriteMaterial extends ShaderMaterial {
     */
     set texture(value) {
         this.uniforms.uTexture.value = value;
-        return this;
     }
     get texture() {
         return this.uniforms.uTexture.value;
