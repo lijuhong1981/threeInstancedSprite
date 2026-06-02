@@ -2,6 +2,7 @@ import Check from "@lijuhong1981/jscheck/src/Check.js";
 import { BufferAttribute, InstancedBufferAttribute, InstancedBufferGeometry, Mesh, Raycaster, Texture } from "three";
 import InstancedSprite from "./InstancedSprite.js";
 import InstancedSpriteMaterial from "./InstancedSpriteMaterial.js";
+import InstancedSpriteNodeMaterial from "./InstancedSpriteNodeMaterial.js";
 
 /**
  * @import InstancedSpriteCollection from "./InstancedSpriteCollection.js";
@@ -194,7 +195,7 @@ class InstancedSpriteMesh extends Mesh {
     constructor(collection, texture) {
         Check.defined('collection', collection);
         Check.defined('texture', texture);
-        super(geometry.clone(), new InstancedSpriteMaterial());
+        super(geometry.clone(), collection.useNodeMaterial ? new InstancedSpriteNodeMaterial() : new InstancedSpriteMaterial());
         this._collection = collection; //所属的InstancedSpriteCollection实例
         this.material.texture = texture;
         /**
@@ -402,3 +403,4 @@ class InstancedSpriteMesh extends Mesh {
 
 export default InstancedSpriteMesh;
 export { InstancedSpriteMesh };
+
