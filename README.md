@@ -1,6 +1,6 @@
 # InstancedSprite
 
-three自带的Sprite并不支持GPU Instancing，当遇到需要在场景中大量展示标签的情况时就会出现帧率下降的问题，所以开发了这个InstancedSprite，以InstancedBufferGeometry+自定义ShaderMaterial的形式实现了Sprite的GPU Instancing，极大的提高了大批量标签展示时的渲染效率。
+three自带的Sprite并不支持GPU实例化渲染，当遇到需要在场景中大量展示标签的情况时就会出现帧率下降的问题，所以开发了这个InstancedSprite，以InstancedBufferGeometry+自定义ShaderMaterial的形式实例化渲染InstancedSprite对象，极大的提高了大批量标签展示时的渲染效率。
 
 ## 安装
 
