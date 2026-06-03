@@ -13,10 +13,12 @@ attribute vec4 aPositionAndShow; // xyz: InstancedSprite位置（世界空间）
 attribute vec4 aCenterAndSize; // xy: 锚点中心(0-1), zw: 图片宽高(像素/米)
 attribute vec3 aScaleAndRotationAndSizeAttenuation; // x: 缩放, y: 旋转(弧度), z: 大小跟随相机深度(0/1)
 attribute vec4 aColorAndOpacity; // RGBA颜色
+attribute vec4 aPickColorAndEnabled; // xyz：拾取颜色，w：是否启用拾取颜色(0/1)
 
 varying float vShow;
 varying vec2 vUv;
 varying vec4 vColorAndOpacity;
+varying vec4 vPickColorAndEnabled;
 
 void main() {
     // --- 1. 提前解包属性（GPU会自动优化，无性能损失）---
@@ -31,6 +33,7 @@ void main() {
     vShow = show;
     vUv = uv;
     vColorAndOpacity = aColorAndOpacity;
+    vPickColorAndEnabled = aPickColorAndEnabled;
 
     // --- 3. 提前隐藏不可见物体（顶点级丢弃，性能最优）---
     if (show < 0.5 || imageSize.x <= 0.0 || imageSize.y <= 0.0) {
@@ -82,21 +85,31 @@ uniform sampler2D uTexture;
 varying float vShow;
 varying vec2 vUv;
 varying vec4 vColorAndOpacity;
+varying vec4 vPickColorAndEnabled;
 
 void main() {
-    vec4 texColor = texture2D(uTexture, vUv);
-    vec4 diffuseColor = texColor * vColorAndOpacity;
-
-    // 丢弃完全透明的像素
-    if (diffuseColor.a < 0.005 || vShow < 0.5) {
+    if (vShow < 0.5) {
         discard;
     }
 
-    gl_FragColor = diffuseColor;
+    float enablePickColor = vPickColorAndEnabled.w;
 
-    #include <logdepthbuf_fragment>
-    #include <tonemapping_fragment>
-	#include <colorspace_fragment>
+    if (enablePickColor > 0.5){
+        gl_FragColor = vec4(vPickColorAndEnabled.xyz, 1.0);
+    } else {
+        vec4 texColor = texture2D(uTexture, vUv);
+        vec4 diffuseColor = texColor * vColorAndOpacity;
+
+        // 丢弃完全透明的像素
+        if (diffuseColor.a < 0.005) {
+            discard;
+        }
+
+        gl_FragColor = diffuseColor;
+        #include <logdepthbuf_fragment>
+        #include <tonemapping_fragment>
+	    #include <colorspace_fragment>
+    }
 }
 `;
 
