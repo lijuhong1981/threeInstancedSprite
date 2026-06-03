@@ -8,6 +8,7 @@ import { Color, InstancedBufferGeometry, MathUtils, Matrix4, Triangle, Vector2, 
  * @import InstancedSpriteCollection from "./InstancedSpriteCollection.js";
  * @import InstancedSpriteMesh from "./InstancedSpriteMesh.js";
  * @import InstancedSpriteMaterial from "./InstancedSpriteMaterial.js";
+ * @import InstancedSpriteNodeMaterial from "./InstancedSpriteNodeMaterial.js";
  */
 
 const imageLoader = new ImageLoader({ cacheType: Loader.CacheType.ALONE, });
@@ -249,8 +250,8 @@ class InstancedSprite {
         return this._mesh ? this._mesh.geometry : undefined;
     }
     /**
-     * InstancedSprite对象的材质属性
-     * @type {InstancedSpriteMaterial}
+     * InstancedSprite对象的材质属性，可能是InstancedSpriteMaterial或InstancedSpriteNodeMaterial
+     * @type {InstancedSpriteMaterial|InstancedSpriteNodeMaterial}
      * @readonly
     */
     get material() {
