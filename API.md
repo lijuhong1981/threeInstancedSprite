@@ -22,6 +22,12 @@
 <dt><a href="#InstancedSpriteMesh">InstancedSpriteMesh</a> ⇐ <code>Mesh</code></dt>
 <dd><p>InstancedSpriteMesh类，基于InstancedBufferGeometry实现的高性能InstancedSprite渲染组件</p>
 </dd>
+<dt><a href="#InstancedSpriteNodeMaterial">InstancedSpriteNodeMaterial</a> ⇐ <code>NodeMaterial</code></dt>
+<dd><p>InstancedSpriteNodeMaterial 材质类，基于 Three.js TSL (Three Shading Language) 语法实现</p>
+<p>功能与 InstancedSpriteMaterial (ShaderMaterial) 完全相同，但使用 TSL 节点系统构建，
+可更好地与 Three.js 的 NodeMaterial 管线集成（自动处理色调映射、色彩空间转换等）。</p>
+<p><strong>注意</strong>：使用此类需要 Three.js 的 WebGPU/TSL 构建（<code>three/webgpu</code>），非标准 <code>three</code> 构建。</p>
+</dd>
 </dl>
 
 ## Constants
@@ -70,7 +76,7 @@ InstancedSprite 数据模型类，用于存储单个 InstancedSprite 的所有�
     * [.imageWidth](#InstancedSprite+imageWidth) : <code>number</code>
     * [.imageHeight](#InstancedSprite+imageHeight) : <code>number</code>
     * [.geometry](#InstancedSprite+geometry) : <code>InstancedBufferGeometry</code>
-    * [.material](#InstancedSprite+material) : [<code>InstancedSpriteMaterial</code>](#InstancedSpriteMaterial)
+    * [.material](#InstancedSprite+material) : [<code>InstancedSpriteMaterial</code>](#InstancedSpriteMaterial) \| [<code>InstancedSpriteNodeMaterial</code>](#InstancedSpriteNodeMaterial)
     * [.setValues(options)](#InstancedSprite+setValues) ⇒ [<code>InstancedSprite</code>](#InstancedSprite)
     * [.remove()](#InstancedSprite+remove) ⇒ [<code>InstancedSprite</code>](#InstancedSprite)
     * [.raycast(raycaster, intersects, modelViewMatrix)](#InstancedSprite+raycast)
@@ -208,8 +214,8 @@ InstancedSprite对象的几何体属性
 **Read only**: true  
 <a name="InstancedSprite+material"></a>
 
-### instancedSprite.material : [<code>InstancedSpriteMaterial</code>](#InstancedSpriteMaterial)
-InstancedSprite对象的材质属性
+### instancedSprite.material : [<code>InstancedSpriteMaterial</code>](#InstancedSpriteMaterial) \| [<code>InstancedSpriteNodeMaterial</code>](#InstancedSpriteNodeMaterial)
+InstancedSprite对象的材质属性，可能是InstancedSpriteMaterial或InstancedSpriteNodeMaterial
 
 **Kind**: instance property of [<code>InstancedSprite</code>](#InstancedSprite)  
 **Read only**: true  
@@ -256,6 +262,8 @@ InstancedSpriteCollection类，批量管理InstancedSprite实例
 **Extends**: <code>Object3D</code>  
 
 * [InstancedSpriteCollection](#InstancedSpriteCollection) ⇐ <code>Object3D</code>
+    * [new InstancedSpriteCollection([useNodeMaterial])](#new_InstancedSpriteCollection_new)
+    * [.useNodeMaterial](#InstancedSpriteCollection+useNodeMaterial) : <code>boolean</code>
     * [.type](#InstancedSpriteCollection+type) : <code>string</code>
     * [.isInstancedSpriteCollection](#InstancedSpriteCollection+isInstancedSpriteCollection) : <code>boolean</code>
     * [.depthTest](#InstancedSpriteCollection+depthTest) : <code>boolean</code>
@@ -269,6 +277,22 @@ InstancedSpriteCollection类，批量管理InstancedSprite实例
     * [.forEach(callback)](#InstancedSpriteCollection+forEach) ⇒ [<code>InstancedSpriteCollection</code>](#InstancedSpriteCollection)
     * [.raycast(raycaster, intersects)](#InstancedSpriteCollection+raycast)
 
+<a name="new_InstancedSpriteCollection_new"></a>
+
+### new InstancedSpriteCollection([useNodeMaterial])
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| [useNodeMaterial] | <code>boolean</code> | <code>false</code> | 是否使用TSL的NodeMaterial，默认false |
+
+<a name="InstancedSpriteCollection+useNodeMaterial"></a>
+
+### instancedSpriteCollection.useNodeMaterial : <code>boolean</code>
+是否使用TSL的NodeMaterial，默认false
+
+**Kind**: instance property of [<code>InstancedSpriteCollection</code>](#InstancedSpriteCollection)  
+**Default**: <code>false</code>  
+**Read only**: true  
 <a name="InstancedSpriteCollection+type"></a>
 
 ### instancedSpriteCollection.type : <code>string</code>
@@ -485,6 +509,24 @@ Computes intersection points between a casted ray and this sprite.
 | raycaster | <code>Raycaster</code> | The raycaster. |
 | intersects | <code>Array.&lt;Object&gt;</code> | The target array that holds the intersection points. |
 
+<a name="InstancedSpriteNodeMaterial"></a>
+
+## InstancedSpriteNodeMaterial ⇐ <code>NodeMaterial</code>
+InstancedSpriteNodeMaterial 材质类，基于 Three.js TSL (Three Shading Language) 语法实现
+
+功能与 InstancedSpriteMaterial (ShaderMaterial) 完全相同，但使用 TSL 节点系统构建，
+可更好地与 Three.js 的 NodeMaterial 管线集成（自动处理色调映射、色彩空间转换等）。
+
+**注意**：使用此类需要 Three.js 的 WebGPU/TSL 构建（`three/webgpu`），非标准 `three` 构建。
+
+**Kind**: global class  
+**Extends**: <code>NodeMaterial</code>  
+<a name="InstancedSpriteNodeMaterial+texture"></a>
+
+### instancedSpriteNodeMaterial.texture : <code>Texture</code> \| <code>null</code>
+图片纹理
+
+**Kind**: instance property of [<code>InstancedSpriteNodeMaterial</code>](#InstancedSpriteNodeMaterial)  
 <a name="imageLoader"></a>
 
 ## imageLoader
@@ -492,6 +534,7 @@ Computes intersection points between a casted ray and this sprite.
 **Import**: InstancedSpriteCollection from "./InstancedSpriteCollection.js";  
 **Import**: InstancedSpriteMesh from "./InstancedSpriteMesh.js";  
 **Import**: InstancedSpriteMaterial from "./InstancedSpriteMaterial.js";  
+**Import**: InstancedSpriteNodeMaterial from "./InstancedSpriteNodeMaterial.js";  
 <a name="InstancedSpriteOptions"></a>
 
 ## InstancedSpriteOptions : <code>object</code>
