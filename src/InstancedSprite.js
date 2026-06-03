@@ -170,6 +170,28 @@ class InstancedSprite {
         this.imageSize = new Vector2(0, 0);
         this._imageSize = new Vector2(0, 0);
         this._image = null;
+        /**
+         * 拾取颜色，用于GPU拾取，由Picking管理器设置和使用，用户无需关心
+         * @type {Color}
+         * @readonly
+         * @private
+        */
+        this.pickColor = new Color();
+        this._pickColor = new Color();
+        /**
+         * 是否启用拾取颜色，用于GPU拾取，由Picking管理器设置和使用，用户无需关心
+         * @type {boolean}
+         * @readonly
+         * @private
+        */
+        this.enablePickColor = false;
+        this._enablePickColor = false;
+        /**
+         * 用户自定义数据存储对象，InstancedSprite本身不使用该属性，用户可以自由使用它来存储任意数据
+         * @type {object}
+         * @readonly
+        */
+        this.userData = {};
 
         this.setValues(options);
     }
