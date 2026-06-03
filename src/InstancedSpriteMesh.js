@@ -36,6 +36,7 @@ const aPositionAndShow = 'aPositionAndShow';
 const aCenterAndSize = 'aCenterAndSize';
 const aScaleAndRotationAndSizeAttenuation = 'aScaleAndRotationAndSizeAttenuation';
 const aColorAndOpacity = 'aColorAndOpacity';
+const aPickColorAndEnabled = 'aPickColorAndEnabled';
 /**
  * InstancedSpriteMaterial使用的attribute名称常量与itemSize大小，InstancedSpriteMesh会根据名称和itemSize创建InstancedBufferAttribute
  * @type {Object<string, number>}
@@ -47,6 +48,7 @@ const AttributesItemSize = Object.freeze({
     aCenterAndSize: 4,
     aScaleAndRotationAndSizeAttenuation: 3,
     aColorAndOpacity: 4,
+    aPickColorAndEnabled: 4,
 });
 /**
  * 检查并更新一个InstancedSprite实例的数据到对应的InstancedBufferAttribute位置
@@ -67,6 +69,8 @@ function checkAndUpdateInstancedSprite(mesh, sprite) {
     const sizeAttenuationChanged = (sprite._sizeAttenuation !== sprite.sizeAttenuation);
     const colorChanged = (sprite._color.equals(sprite.color) === false);
     const opacityChanged = (sprite._opacity !== sprite.opacity);
+    const pickColorChanged = (sprite._pickColor.equals(sprite.pickColor) === false);
+    const enablePickColorChanged = (sprite._enablePickColor !== sprite.enablePickColor);
 
     let idx = 0;
 
@@ -130,6 +134,21 @@ function checkAndUpdateInstancedSprite(mesh, sprite) {
             attributesData.aColorAndOpacity[idx + 3] = sprite._opacity;
         }
         mesh.geometry.attributes.aColorAndOpacity.needsUpdate = true;
+    }
+
+    if (pickColorChanged || enablePickColorChanged) {
+        idx = index * AttributesItemSize.aPickColorAndEnabled;
+        if (pickColorChanged) {
+            sprite._pickColor.copy(sprite.pickColor);
+            attributesData.aPickColorAndEnabled[idx] = sprite._pickColor.r;
+            attributesData.aPickColorAndEnabled[idx + 1] = sprite._pickColor.g;
+            attributesData.aPickColorAndEnabled[idx + 2] = sprite._pickColor.b;
+        }
+        if (enablePickColorChanged) {
+            sprite._enablePickColor = sprite.enablePickColor;
+            attributesData.aPickColorAndEnabled[idx + 3] = sprite._enablePickColor ? 1 : 0;
+        }
+        mesh.geometry.attributes.aPickColorAndEnabled.needsUpdate = true;
     }
 };
 /**
