@@ -42,6 +42,7 @@ class InstancedSpriteNodeMaterial extends NodeMaterial {
         const aCenterAndSize = attribute('aCenterAndSize', 'vec4');
         const aScaleAndRotationAndSizeAttenuation = attribute('aScaleAndRotationAndSizeAttenuation', 'vec3');
         const aColorAndOpacity = attribute('aColorAndOpacity', 'vec4');
+        const aPickColorAndEnabled = attribute('aPickColorAndEnabled', 'vec4');
 
         // ============================================================
         // Varying 变量 — 从顶点着色器传递到片元着色器
@@ -49,6 +50,7 @@ class InstancedSpriteNodeMaterial extends NodeMaterial {
         const vShow = varying(float(1));
         const vColorAndOpacity = varying(vec4(1));
         const vUv = varying(vec2(1));
+        const vPickColorAndEnabled = varying(vec4(1));
 
         // ============================================================
         // 顶点着色器 (vertexNode)
@@ -66,6 +68,7 @@ class InstancedSpriteNodeMaterial extends NodeMaterial {
             vShow.assign(show);
             vColorAndOpacity.assign(aColorAndOpacity);
             vUv.assign(uv());
+            vPickColorAndEnabled.assign(aPickColorAndEnabled);
 
             // --- 3. 计算模型视图位置 ---
             const mvPosition = modelViewMatrix.mul(vec4(aPositionAndShow.xyz, 1));
@@ -122,12 +125,24 @@ class InstancedSpriteNodeMaterial extends NodeMaterial {
         // 片元着色器 (fragmentNode)
         // ============================================================
         this.fragmentNode = Fn(() => {
-            // 采样纹理
-            const texColor = texture(this._textureNode, vUv);
-            const diffuseColor = texColor.mul(vColorAndOpacity);
+            Discard(vShow.lessThan(0.5));
 
-            // 丢弃完全透明或隐藏的像素
-            Discard(diffuseColor.a.lessThan(0.005).or(vShow.lessThan(0.5)));
+            const enablePickColor = vPickColorAndEnabled.w.greaterThan(0.5);
+            const diffuseColor = vec4(0, 0, 0, 1).toVar('diffuseColor');
+
+            If(enablePickColor, () => {
+                // 拾取模式：直接输出拾取颜色，不受纹理/透明度影响
+                diffuseColor.assign(vec4(vPickColorAndEnabled.xyz, 1));
+            }).Else(() => {
+                // 采样纹理
+                const texColor = texture(this._textureNode, vUv);
+                const color = texColor.mul(vColorAndOpacity);
+
+                // 丢弃完全透明的像素
+                Discard(color.a.lessThan(0.005));
+
+                diffuseColor.assign(color);
+            });
 
             return diffuseColor;
         }).once();
@@ -142,7 +157,7 @@ class InstancedSpriteNodeMaterial extends NodeMaterial {
     set texture(value) {
         this._textureNode.value = value;
     }
-}
+};
 
 export default InstancedSpriteNodeMaterial;
 export { InstancedSpriteNodeMaterial };
