@@ -68,6 +68,7 @@ InstancedSprite 数据模型类，用于存储单个 InstancedSprite 的所有�
     * [.color](#InstancedSprite+color) : <code>Color</code>
     * [.opacity](#InstancedSprite+opacity) : <code>number</code>
     * [.imageSize](#InstancedSprite+imageSize) : <code>Vector2</code>
+    * [.userData](#InstancedSprite+userData) : <code>object</code>
     * [.isInstancedSprite](#InstancedSprite+isInstancedSprite) : <code>boolean</code>
     * [.visible](#InstancedSprite+visible) : <code>boolean</code>
     * [.rotationDegrees](#InstancedSprite+rotationDegrees) : <code>number</code>
@@ -156,6 +157,13 @@ InstancedSprite 数据模型类，用于存储单个 InstancedSprite 的所有�
 
 ### instancedSprite.imageSize : <code>Vector2</code>
 图片尺寸（像素），图片加载完成后可用
+
+**Kind**: instance property of [<code>InstancedSprite</code>](#InstancedSprite)  
+**Read only**: true  
+<a name="InstancedSprite+userData"></a>
+
+### instancedSprite.userData : <code>object</code>
+用户自定义数据存储对象，InstancedSprite本身不使用该属性，用户可以自由使用它来存储任意数据
 
 **Kind**: instance property of [<code>InstancedSprite</code>](#InstancedSprite)  
 **Read only**: true  
