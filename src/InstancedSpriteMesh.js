@@ -442,30 +442,37 @@ class InstancedSpriteMesh extends Mesh {
         this._ensureCapacity(requiredCapacity);
 
         if (removeInstancedSprites.length > 0) {
-            // 如果有需要移除的InstancedSprite，先从instancedSprites数组中移除
+            // 末位换入（swap-and-pop）移除：把最后一个 sprite 换到被移除的位置，O(k) 而非 O(n) 全量重写
+            const movedSprites = [];
             for (const sprite of removeInstancedSprites) {
-                const index = instancedSprites.indexOf(sprite);
-                if (index !== -1) {
-                    instancedSprites.splice(index, 1); //从instancedSprites数组中移除
-                    sprite._mesh = undefined;
-                    sprite._instanceIndex = -1;
+                const index = sprite._instanceIndex;
+                if (index === -1)
+                    continue; // 已被处理过（例如换入后又在本帧被移除）
+
+                const last = instancedSprites[instancedSprites.length - 1];
+                instancedSprites.pop();
+                if (last !== sprite) {
+                    instancedSprites[index] = last;
+                    last._instanceIndex = index; // 立即更新，避免后续删除用到陈旧索引
+                    movedSprites.push(last);
                 }
-                // else
-                //     console.warn('InstancedSprite not found in InstancedSpriteMesh during removal');
+                sprite._instanceIndex = -1;
+                sprite._mesh = undefined;
             }
             removeInstancedSprites.length = 0;
 
-            // 如果有需要添加的InstancedSprite，则加入instancedSprites数组中
-            if (addInstancedSprites.length > 0) {
-                instancedSprites.push(...addInstancedSprites);
-                addInstancedSprites.length = 0;
+            // 重写被移动 sprite 的数据到新位置
+            for (const sprite of movedSprites) {
+                if (sprite._instanceIndex !== -1) {
+                    addInstancedSprite(this, sprite, sprite._instanceIndex);
+                }
             }
 
-            // 重新写入所有InstancedSprite的属性数据到InstancedBufferAttribute中
-            const length = instancedSprites.length;
-            for (let i = 0; i < length; i++) {
-                const sprite = instancedSprites[i];
-                addInstancedSprite(this, sprite, i);
+            // 添加新 sprite
+            while (addInstancedSprites.length > 0) {
+                const sprite = addInstancedSprites.shift();
+                addInstancedSprite(this, sprite, instancedSprites.length);
+                instancedSprites.push(sprite);
             }
         } else {
             // 检查并更新属性值有变化的InstancedSprite
