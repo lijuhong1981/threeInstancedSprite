@@ -12,8 +12,8 @@
 <dd><p>InstancedSpriteCollection类，批量管理InstancedSprite实例</p>
 <ul>
 <li>继承自Object3D</li>
-<li>根据InstancedSprite的图像属性生成InstancedSpriteMaterial和InstancedSpriteMesh，</li>
-<li>管理InstancedSprite与InstancedSpriteMesh实例</li>
+<li>使用纹理图集将不同图片打包，一张图集对应一个 InstancedSpriteMesh（一次 draw call）</li>
+<li>图集扩容到上限后会新建图集与 Mesh</li>
 </ul>
 </dd>
 <dt><a href="#InstancedSpriteMaterial">InstancedSpriteMaterial</a> ⇐ <code>ShaderMaterial</code></dt>
@@ -21,12 +21,16 @@
 </dd>
 <dt><a href="#InstancedSpriteMesh">InstancedSpriteMesh</a> ⇐ <code>Mesh</code></dt>
 <dd><p>InstancedSpriteMesh类，基于InstancedBufferGeometry实现的高性能InstancedSprite渲染组件</p>
+<p>一张图集纹理对应一个 InstancedSpriteMesh，所有使用该图集的 Sprite 由其统一绘制</p>
 </dd>
 <dt><a href="#InstancedSpriteNodeMaterial">InstancedSpriteNodeMaterial</a> ⇐ <code>NodeMaterial</code></dt>
 <dd><p>InstancedSpriteNodeMaterial 材质类，基于 Three.js TSL (Three Shading Language) 语法实现</p>
 <p>功能与 InstancedSpriteMaterial (ShaderMaterial) 完全相同，但使用 TSL 节点系统构建，
 可更好地与 Three.js 的 NodeMaterial 管线集成（自动处理色调映射、色彩空间转换等）。</p>
 <p><strong>注意</strong>：使用此类需要 Three.js 的 WebGPU/TSL 构建（<code>three/webgpu</code>），非标准 <code>three</code> 构建。</p>
+</dd>
+<dt><a href="#TextureAtlas">TextureAtlas</a></dt>
+<dd><p>纹理图集，将多张图片按行（shelf）打包进一张 Canvas 纹理，用于合并 draw call</p>
 </dd>
 </dl>
 
@@ -263,18 +267,19 @@ Computes intersection points between a casted ray and this sprite.
 InstancedSpriteCollection类，批量管理InstancedSprite实例
 
 * 继承自Object3D
-* 根据InstancedSprite的图像属性生成InstancedSpriteMaterial和InstancedSpriteMesh，
-* 管理InstancedSprite与InstancedSpriteMesh实例
+* 使用纹理图集将不同图片打包，一张图集对应一个 InstancedSpriteMesh（一次 draw call）
+* 图集扩容到上限后会新建图集与 Mesh
 
 **Kind**: global class  
 **Extends**: <code>Object3D</code>  
 
 * [InstancedSpriteCollection](#InstancedSpriteCollection) ⇐ <code>Object3D</code>
-    * [new InstancedSpriteCollection([useNodeMaterial])](#new_InstancedSpriteCollection_new)
+    * [new InstancedSpriteCollection([useNodeMaterial], [options])](#new_InstancedSpriteCollection_new)
     * [.useNodeMaterial](#InstancedSpriteCollection+useNodeMaterial) : <code>boolean</code>
     * [.type](#InstancedSpriteCollection+type) : <code>string</code>
     * [.isInstancedSpriteCollection](#InstancedSpriteCollection+isInstancedSpriteCollection) : <code>boolean</code>
     * [.depthTest](#InstancedSpriteCollection+depthTest) : <code>boolean</code>
+    * [.depthWrite](#InstancedSpriteCollection+depthWrite) : <code>boolean</code>
     * [.instancedSprites](#InstancedSpriteCollection+instancedSprites) : [<code>Array.&lt;InstancedSprite&gt;</code>](#InstancedSprite)
     * [.size](#InstancedSpriteCollection+size) : <code>number</code>
     * [._setImage(source, sprite)](#InstancedSpriteCollection+_setImage)
@@ -289,11 +294,15 @@ InstancedSpriteCollection类，批量管理InstancedSprite实例
 
 <a name="new_InstancedSpriteCollection_new"></a>
 
-### new InstancedSpriteCollection([useNodeMaterial])
+### new InstancedSpriteCollection([useNodeMaterial], [options])
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
-| [useNodeMaterial] | <code>boolean</code> | <code>false</code> | 是否使用TSL的NodeMaterial，默认false |
+| [useNodeMaterial] | <code>boolean</code> | <code>false</code> | 是否使用TSL的NodeMaterial（WebGPU），默认false |
+| [options] | <code>object</code> |  | 图集配置项 |
+| [options.initialSize] | <code>number</code> | <code>1024</code> | 图集初始边长 |
+| [options.maxSize] | <code>number</code> | <code>8192</code> | 图集最大边长 |
+| [options.padding] | <code>number</code> | <code>2</code> | 子图间距 |
 
 <a name="InstancedSpriteCollection+useNodeMaterial"></a>
 
@@ -321,6 +330,13 @@ InstancedSpriteCollection对象标识
 
 ### instancedSpriteCollection.depthTest : <code>boolean</code>
 深度测试开关，默认为true，开启后会进行深度测试以正确处理遮挡关系，但可能会有性能影响；如果关闭则所有InstancedSprite都会被渲染在最前面，适合需要始终显示的UI元素等场景
+
+**Kind**: instance property of [<code>InstancedSpriteCollection</code>](#InstancedSpriteCollection)  
+**Default**: <code>true</code>  
+<a name="InstancedSpriteCollection+depthWrite"></a>
+
+### instancedSpriteCollection.depthWrite : <code>boolean</code>
+深度写入开关，默认为true；多个半透明 Sprite 重叠时，开启深度写入可能导致排序瑕疵（后方 Sprite 被错误遮挡），关闭可缓解，适合半透明标签/粒子等场景
 
 **Kind**: instance property of [<code>InstancedSpriteCollection</code>](#InstancedSpriteCollection)  
 **Default**: <code>true</code>  
@@ -395,13 +411,13 @@ InstancedSprite实例数量
 <a name="InstancedSpriteCollection+clear"></a>
 
 ### instancedSpriteCollection.clear() ⇒ [<code>InstancedSpriteCollection</code>](#InstancedSpriteCollection)
-移除所有InstancedSprite，并清空所有Mesh的实例数据（Mesh本身保留以便复用）
+移除所有InstancedSprite，并清空所有Mesh的实例数据（Mesh与图集保留以便复用）
 
 **Kind**: instance method of [<code>InstancedSpriteCollection</code>](#InstancedSpriteCollection)  
 <a name="InstancedSpriteCollection+reserve"></a>
 
 ### instancedSpriteCollection.reserve(capacity) ⇒ [<code>InstancedSpriteCollection</code>](#InstancedSpriteCollection)
-预分配所有Mesh的容量，避免后续动态扩容（适用于提前知道大致实例数量的场景）
+预分配所有Mesh的容量，避免后续动态扩容
 
 **Kind**: instance method of [<code>InstancedSpriteCollection</code>](#InstancedSpriteCollection)  
 
@@ -450,6 +466,8 @@ InstancedSprite 材质类，以attribute形式传入InstancedSprite对象实例�
 ## InstancedSpriteMesh ⇐ <code>Mesh</code>
 InstancedSpriteMesh类，基于InstancedBufferGeometry实现的高性能InstancedSprite渲染组件
 
+一张图集纹理对应一个 InstancedSpriteMesh，所有使用该图集的 Sprite 由其统一绘制
+
 **Kind**: global class  
 **Extends**: <code>Mesh</code>  
 
@@ -459,12 +477,14 @@ InstancedSpriteMesh类，基于InstancedBufferGeometry实现的高性能Instance
     * [.frustumCulled](#InstancedSpriteMesh+frustumCulled) : <code>boolean</code>
     * [.isInstancedSpriteMesh](#InstancedSpriteMesh+isInstancedSpriteMesh) : <code>boolean</code>
     * [.depthTest](#InstancedSpriteMesh+depthTest) : <code>boolean</code>
+    * [.depthWrite](#InstancedSpriteMesh+depthWrite) : <code>boolean</code>
     * [.instancedSprites](#InstancedSpriteMesh+instancedSprites) : [<code>Array.&lt;InstancedSprite&gt;</code>](#InstancedSprite)
     * [.reserve(capacity)](#InstancedSpriteMesh+reserve) ⇒ [<code>InstancedSpriteMesh</code>](#InstancedSpriteMesh)
     * [.add(sprite)](#InstancedSpriteMesh+add) ⇒ [<code>InstancedSpriteMesh</code>](#InstancedSpriteMesh)
     * [.remove(sprite)](#InstancedSpriteMesh+remove) ⇒ [<code>InstancedSpriteMesh</code>](#InstancedSpriteMesh)
     * [.clear()](#InstancedSpriteMesh+clear) ⇒ [<code>InstancedSpriteMesh</code>](#InstancedSpriteMesh)
     * [.raycast(raycaster, intersects)](#InstancedSpriteMesh+raycast)
+    * [.dispose()](#InstancedSpriteMesh+dispose)
 
 <a name="new_InstancedSpriteMesh_new"></a>
 
@@ -473,7 +493,7 @@ InstancedSpriteMesh类，基于InstancedBufferGeometry实现的高性能Instance
 | Param | Type | Description |
 | --- | --- | --- |
 | collection | [<code>InstancedSpriteCollection</code>](#InstancedSpriteCollection) | 所属的InstancedSpriteCollection实例，必填 |
-| texture | <code>Texture</code> | 材质图像纹理，必填 |
+| texture | <code>Texture</code> | 图集纹理，必填 |
 
 <a name="InstancedSpriteMesh+type"></a>
 
@@ -500,6 +520,13 @@ InstancedSpriteMesh对象标识
 
 ### instancedSpriteMesh.depthTest : <code>boolean</code>
 深度测试开关，默认为true，开启后会进行深度测试以正确处理遮挡关系，但可能会有性能影响；如果关闭则所有InstancedSprite都会被渲染在最前面，适合需要始终显示的UI元素等场景
+
+**Kind**: instance property of [<code>InstancedSpriteMesh</code>](#InstancedSpriteMesh)  
+**Default**: <code>true</code>  
+<a name="InstancedSpriteMesh+depthWrite"></a>
+
+### instancedSpriteMesh.depthWrite : <code>boolean</code>
+深度写入开关，默认为true；多个半透明 Sprite 重叠时，开启深度写入可能导致排序瑕疵（后方 Sprite 被错误遮挡），关闭可缓解，适合半透明标签/粒子等场景
 
 **Kind**: instance property of [<code>InstancedSpriteMesh</code>](#InstancedSpriteMesh)  
 **Default**: <code>true</code>  
@@ -561,6 +588,12 @@ Computes intersection points between a casted ray and this sprite.
 | raycaster | <code>Raycaster</code> | The raycaster. |
 | intersects | <code>Array.&lt;Object&gt;</code> | The target array that holds the intersection points. |
 
+<a name="InstancedSpriteMesh+dispose"></a>
+
+### instancedSpriteMesh.dispose()
+释放 GPU 资源
+
+**Kind**: instance method of [<code>InstancedSpriteMesh</code>](#InstancedSpriteMesh)  
 <a name="InstancedSpriteNodeMaterial"></a>
 
 ## InstancedSpriteNodeMaterial ⇐ <code>NodeMaterial</code>
@@ -579,6 +612,70 @@ InstancedSpriteNodeMaterial 材质类，基于 Three.js TSL (Three Shading Langu
 图片纹理
 
 **Kind**: instance property of [<code>InstancedSpriteNodeMaterial</code>](#InstancedSpriteNodeMaterial)  
+<a name="TextureAtlas"></a>
+
+## TextureAtlas
+纹理图集，将多张图片按行（shelf）打包进一张 Canvas 纹理，用于合并 draw call
+
+**Kind**: global class  
+
+* [TextureAtlas](#TextureAtlas)
+    * [new TextureAtlas([options])](#new_TextureAtlas_new)
+    * [.add(source)](#TextureAtlas+add) ⇒ <code>Object</code> \| <code>null</code>
+    * [.getRect(source)](#TextureAtlas+getRect) ⇒ <code>Object</code> \| <code>undefined</code>
+    * [.grow()](#TextureAtlas+grow) ⇒ <code>boolean</code>
+    * [.getUvRect(rect)](#TextureAtlas+getUvRect) ⇒ <code>Array.&lt;number&gt;</code>
+
+<a name="new_TextureAtlas_new"></a>
+
+### new TextureAtlas([options])
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| [options] | <code>object</code> |  |  |
+| [options.initialSize] | <code>number</code> | <code>1024</code> | 初始边长（正方形，单位像素） |
+| [options.maxSize] | <code>number</code> | <code>8192</code> | 最大边长，自动扩容到该值后不再增大 |
+| [options.padding] | <code>number</code> | <code>2</code> | 子图间距，防止线性过滤时边缘渗色 |
+
+<a name="TextureAtlas+add"></a>
+
+### textureAtlas.add(source) ⇒ <code>Object</code> \| <code>null</code>
+将图片加入图集，返回其像素矩形；已加入过则返回缓存；图集整体已满则返回null
+
+**Kind**: instance method of [<code>TextureAtlas</code>](#TextureAtlas)  
+
+| Param | Type |
+| --- | --- |
+| source | <code>HTMLImageElement</code> \| <code>HTMLCanvasElement</code> | 
+
+<a name="TextureAtlas+getRect"></a>
+
+### textureAtlas.getRect(source) ⇒ <code>Object</code> \| <code>undefined</code>
+获取图片已分配的像素矩形
+
+**Kind**: instance method of [<code>TextureAtlas</code>](#TextureAtlas)  
+
+| Param | Type |
+| --- | --- |
+| source | <code>HTMLImageElement</code> \| <code>HTMLCanvasElement</code> | 
+
+<a name="TextureAtlas+grow"></a>
+
+### textureAtlas.grow() ⇒ <code>boolean</code>
+扩容图集（边长翻倍），成功返回true；已达最大尺寸返回false
+
+**Kind**: instance method of [<code>TextureAtlas</code>](#TextureAtlas)  
+<a name="TextureAtlas+getUvRect"></a>
+
+### textureAtlas.getUvRect(rect) ⇒ <code>Array.&lt;number&gt;</code>
+将像素矩形转为归一化 UV（uOffset, vOffset, uScale, vScale）
+
+**Kind**: instance method of [<code>TextureAtlas</code>](#TextureAtlas)  
+
+| Param | Type |
+| --- | --- |
+| rect | <code>Object</code> | 
+
 <a name="imageLoader"></a>
 
 ## imageLoader

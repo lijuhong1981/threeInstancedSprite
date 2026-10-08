@@ -43,6 +43,7 @@ class InstancedSpriteNodeMaterial extends NodeMaterial {
         const aScaleAndRotationAndSizeAttenuation = attribute('aScaleAndRotationAndSizeAttenuation', 'vec3');
         const aColorAndOpacity = attribute('aColorAndOpacity', 'vec4');
         const aPickColorAndEnabled = attribute('aPickColorAndEnabled', 'vec4');
+        const aUvRect = attribute('aUvRect', 'vec4');
 
         // ============================================================
         // Varying 变量 — 从顶点着色器传递到片元着色器
@@ -67,7 +68,7 @@ class InstancedSpriteNodeMaterial extends NodeMaterial {
             // --- 2. 输出 varying ---
             vShow.assign(show);
             vColorAndOpacity.assign(aColorAndOpacity);
-            vUv.assign(uv());
+            vUv.assign(aUvRect.xy.add(uv().mul(aUvRect.zw)));
             vPickColorAndEnabled.assign(aPickColorAndEnabled);
 
             // --- 3. 计算模型视图位置 ---

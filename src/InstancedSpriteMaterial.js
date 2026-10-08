@@ -14,6 +14,7 @@ attribute vec4 aCenterAndSize; // xy: 锚点中心(0-1), zw: 图片宽高(像素
 attribute vec3 aScaleAndRotationAndSizeAttenuation; // x: 缩放, y: 旋转(弧度), z: 大小跟随相机深度(0/1)
 attribute vec4 aColorAndOpacity; // RGBA颜色
 attribute vec4 aPickColorAndEnabled; // xyz：拾取颜色，w：是否启用拾取颜色(0/1)
+attribute vec4 aUvRect; // xy: UV偏移, zw: UV缩放（非图集模式为(0,0,1,1)）
 
 varying float vShow;
 varying vec2 vUv;
@@ -31,7 +32,7 @@ void main() {
 
     // --- 2. 输出varying变量 ---
     vShow = show;
-    vUv = uv;
+    vUv = aUvRect.xy + uv * aUvRect.zw;
     vColorAndOpacity = aColorAndOpacity;
     vPickColorAndEnabled = aPickColorAndEnabled;
 

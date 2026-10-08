@@ -3,3 +3,4 @@ export * from "./src/InstancedSpriteCollection.js";
 export * from "./src/InstancedSpriteMaterial.js";
 export * from "./src/InstancedSpriteMesh.js";
 export * from "./src/InstancedSpriteNodeMaterial.js";
+export * from "./src/TextureAtlas.js";

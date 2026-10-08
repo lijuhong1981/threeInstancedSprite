@@ -49,6 +49,7 @@ const AttributesItemSize = Object.freeze({
     aScaleAndRotationAndSizeAttenuation: 3,
     aColorAndOpacity: 4,
     aPickColorAndEnabled: 4,
+    aUvRect: 4,
 });
 /**
  * 将指定实例的属性片段标记为需要更新，仅上传该实例对应的数据范围（增量上传）
@@ -76,7 +77,7 @@ function markFullUpdate(mesh, name) {
 }
 /**
  * 检查并更新一个InstancedSprite实例的数据到对应的InstancedBufferAttribute位置
- * @param {InstancedSpriteMesh} mesh 
+ * @param {InstancedSpriteMesh} mesh
  * @param {InstancedSprite} sprite
  * @ignore
 */
@@ -95,6 +96,7 @@ function checkAndUpdateInstancedSprite(mesh, sprite) {
     const opacityChanged = (sprite._opacity !== sprite.opacity);
     const pickColorChanged = (sprite._pickColor.equals(sprite.pickColor) === false);
     const enablePickColorChanged = (sprite._enablePickColor !== sprite.enablePickColor);
+    const uvRectChanged = (sprite._uvRect.equals(sprite.uvRect) === false);
 
     let idx = 0;
 
@@ -174,12 +176,22 @@ function checkAndUpdateInstancedSprite(mesh, sprite) {
         }
         markUpdateRange(mesh, 'aPickColorAndEnabled', index, AttributesItemSize.aPickColorAndEnabled);
     }
+
+    if (uvRectChanged) {
+        idx = index * AttributesItemSize.aUvRect;
+        sprite._uvRect.copy(sprite.uvRect);
+        attributesData.aUvRect[idx] = sprite._uvRect.x;
+        attributesData.aUvRect[idx + 1] = sprite._uvRect.y;
+        attributesData.aUvRect[idx + 2] = sprite._uvRect.z;
+        attributesData.aUvRect[idx + 3] = sprite._uvRect.w;
+        markUpdateRange(mesh, 'aUvRect', index, AttributesItemSize.aUvRect);
+    }
 };
 /**
  * 添加一个InstancedSprite实例的数据到InstancedBufferAttribute中对应的位置
  * @param {InstancedSpriteMesh} mesh
  * @param {InstancedSprite} sprite
- * @param {number} index 
+ * @param {number} index
  * @ignore
 */
 function addInstancedSprite(mesh, sprite, index) {
@@ -222,17 +234,27 @@ function addInstancedSprite(mesh, sprite, index) {
     sprite._opacity = sprite.opacity;
     attributesData.aColorAndOpacity[idx + 3] = sprite._opacity;
     markFullUpdate(mesh, 'aColorAndOpacity');
+
+    idx = index * AttributesItemSize.aUvRect;
+    sprite._uvRect.copy(sprite.uvRect);
+    attributesData.aUvRect[idx] = sprite._uvRect.x;
+    attributesData.aUvRect[idx + 1] = sprite._uvRect.y;
+    attributesData.aUvRect[idx + 2] = sprite._uvRect.z;
+    attributesData.aUvRect[idx + 3] = sprite._uvRect.w;
+    markFullUpdate(mesh, 'aUvRect');
 };
 
 /**
  * InstancedSpriteMesh类，基于InstancedBufferGeometry实现的高性能InstancedSprite渲染组件
- * 
+ *
+ * 一张图集纹理对应一个 InstancedSpriteMesh，所有使用该图集的 Sprite 由其统一绘制
+ *
  * @extends {Mesh}
 */
 class InstancedSpriteMesh extends Mesh {
     /**
      * @param {InstancedSpriteCollection} collection - 所属的InstancedSpriteCollection实例，必填
-     * @param {Texture} texture - 材质图像纹理，必填
+     * @param {Texture} texture - 图集纹理，必填
      * @constructor
     */
     constructor(collection, texture) {
@@ -299,6 +321,16 @@ class InstancedSpriteMesh extends Mesh {
     set depthTest(value) {
         Check.typeOf.boolean('depthTest', value);
         this.material.depthTest = value;
+    }
+    /**
+     * 深度写入开关，默认为true；多个半透明 Sprite 重叠时，开启深度写入可能导致排序瑕疵（后方 Sprite 被错误遮挡），关闭可缓解，适合半透明标签/粒子等场景
+     * @type {boolean}
+     * @default true
+    */
+    get depthWrite() { return this.material.depthWrite; }
+    set depthWrite(value) {
+        Check.typeOf.boolean('depthWrite', value);
+        this.material.depthWrite = value;
     }
     /**
      * InstancedSprite对象数组
@@ -451,6 +483,9 @@ class InstancedSpriteMesh extends Mesh {
 
         this.geometry.instanceCount = instancedSprites.length; //更新instanceCount
     }
+    /**
+     * 释放 GPU 资源
+    */
     dispose() {
         this.clear();
         this.geometry.dispose();
@@ -460,4 +495,3 @@ class InstancedSpriteMesh extends Mesh {
 
 export default InstancedSpriteMesh;
 export { InstancedSpriteMesh };
-

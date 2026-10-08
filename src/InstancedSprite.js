@@ -2,7 +2,7 @@ import Check from "@lijuhong1981/jscheck/src/Check.js";
 import ImageLoader from "@lijuhong1981/jsload/src/ImageLoader.js";
 import { Loader } from "@lijuhong1981/jsload/src/Loader.js";
 import setValues from "@lijuhong1981/three.utils/src/setValues.js";
-import { Color, InstancedBufferGeometry, MathUtils, Matrix4, Triangle, Vector2, Vector3 } from "three";
+import { Color, InstancedBufferGeometry, MathUtils, Matrix4, Triangle, Vector2, Vector3, Vector4 } from "three";
 
 /**
  * @import InstancedSpriteCollection from "./InstancedSpriteCollection.js";
@@ -169,6 +169,13 @@ class InstancedSprite {
         */
         this.imageSize = new Vector2(0, 0);
         this._imageSize = new Vector2(0, 0);
+        /**
+         * 图集UV区域（x: u偏移, y: v偏移, z: u缩放, w: v缩放），非图集模式默认为(0,0,1,1)即整张纹理
+         * @type {Vector4}
+         * @ignore
+        */
+        this.uvRect = new Vector4(0, 0, 1, 1);
+        this._uvRect = new Vector4(0, 0, 1, 1);
         this._image = null;
         /**
          * 拾取颜色，用于GPU拾取，由Picking管理器设置和使用，用户无需关心
