@@ -52,11 +52,22 @@ class InstancedSpriteCollection extends Object3D {
         */
         this._instancedSprites = [];
         /**
+         * @type {Map<string, InstancedSprite>}
+         * @ignore
+        */
+        this._spriteByUuid = new Map();
+        /**
          * @type {Map<HTMLImageElement|HTMLCanvasElement, InstancedSpriteMesh>}
          * @ignore
         */
         this._meshes = new Map();
         this._depthTest = true;
+        /**
+         * 预留容量，在创建新Mesh时应用，undefined表示不预留
+         * @type {number|undefined}
+         * @ignore
+        */
+        this._reservedCapacity = undefined;
     }
     /**
      * InstancedSpriteCollection对象标识
@@ -71,7 +82,7 @@ class InstancedSpriteCollection extends Object3D {
     */
     get depthTest() { return this._depthTest; }
     set depthTest(value) {
-        Check.typeOf.boolean(value, 'depthTest');
+        Check.typeOf.boolean('depthTest', value);
         this._depthTest = value;
         const meshes = this._meshes.values();
         for (const mesh of meshes) {
@@ -105,6 +116,9 @@ class InstancedSpriteCollection extends Object3D {
                 }
                 mesh = new InstancedSpriteMesh(this, texture);
                 mesh.depthTest = this._depthTest;
+                if (this._reservedCapacity !== undefined) {
+                    mesh.reserve(this._reservedCapacity);
+                }
                 this._meshes.set(source, mesh);
                 super.add(mesh);
             }
@@ -159,19 +173,17 @@ class InstancedSpriteCollection extends Object3D {
      * @returns {InstancedSprite|undefined}
     */
     getByUuid(uuid) {
-        for (const sprite of this._instancedSprites) {
-            if (sprite.uuid === uuid)
-                return sprite;
-        }
+        return this._spriteByUuid.get(uuid);
     }
     /**
      * 添加InstancedSprite
-     * @type {InstancedSpriteConstructorOptions} options
+     * @param {InstancedSpriteOptions} options - 初始化配置项
      * @returns {InstancedSprite}
     */
     add(options = {}) {
         const sprite = new InstancedSprite(options, this);
         this._instancedSprites.push(sprite);
+        this._spriteByUuid.set(sprite.uuid, sprite);
         return sprite;
     }
     /**
@@ -183,6 +195,7 @@ class InstancedSpriteCollection extends Object3D {
         const index = this._instancedSprites.indexOf(sprite);
         if (index !== -1) {
             this._instancedSprites.splice(index, 1);
+            this._spriteByUuid.delete(sprite.uuid);
             sprite._remove();
         }
         return this;
@@ -197,9 +210,24 @@ class InstancedSpriteCollection extends Object3D {
             sprite._instanceIndex = -1;
         }
         this._instancedSprites.length = 0;
+        this._spriteByUuid.clear();
         const meshes = this._meshes.values();
         for (const mesh of meshes) {
             mesh.clear();
+        }
+        return this;
+    }
+    /**
+     * 预分配所有Mesh的容量，避免后续动态扩容（适用于提前知道大致实例数量的场景）
+     * @param {number} capacity - 需要预留的实例数量
+     * @returns {InstancedSpriteCollection}
+    */
+    reserve(capacity) {
+        Check.typeOf.number('capacity', capacity);
+        this._reservedCapacity = capacity;
+        const meshes = this._meshes.values();
+        for (const mesh of meshes) {
+            mesh.reserve(capacity);
         }
         return this;
     }

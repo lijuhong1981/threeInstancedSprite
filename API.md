@@ -280,9 +280,10 @@ InstancedSpriteCollection类，批量管理InstancedSprite实例
     * [._setImage(source, sprite)](#InstancedSpriteCollection+_setImage)
     * [.get(index)](#InstancedSpriteCollection+get) ⇒ [<code>InstancedSprite</code>](#InstancedSprite) \| <code>undefined</code>
     * [.getByUuid(uuid)](#InstancedSpriteCollection+getByUuid) ⇒ [<code>InstancedSprite</code>](#InstancedSprite) \| <code>undefined</code>
-    * [.add()](#InstancedSpriteCollection+add) ⇒ [<code>InstancedSprite</code>](#InstancedSprite)
+    * [.add(options)](#InstancedSpriteCollection+add) ⇒ [<code>InstancedSprite</code>](#InstancedSprite)
     * [.remove(sprite)](#InstancedSpriteCollection+remove) ⇒ [<code>InstancedSpriteCollection</code>](#InstancedSpriteCollection)
     * [.clear()](#InstancedSpriteCollection+clear) ⇒ [<code>InstancedSpriteCollection</code>](#InstancedSpriteCollection)
+    * [.reserve(capacity)](#InstancedSpriteCollection+reserve) ⇒ [<code>InstancedSpriteCollection</code>](#InstancedSpriteCollection)
     * [.forEach(callback)](#InstancedSpriteCollection+forEach) ⇒ [<code>InstancedSpriteCollection</code>](#InstancedSpriteCollection)
     * [.raycast(raycaster, intersects)](#InstancedSpriteCollection+raycast)
 
@@ -371,10 +372,15 @@ InstancedSprite实例数量
 
 <a name="InstancedSpriteCollection+add"></a>
 
-### instancedSpriteCollection.add() ⇒ [<code>InstancedSprite</code>](#InstancedSprite)
+### instancedSpriteCollection.add(options) ⇒ [<code>InstancedSprite</code>](#InstancedSprite)
 添加InstancedSprite
 
 **Kind**: instance method of [<code>InstancedSpriteCollection</code>](#InstancedSpriteCollection)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| options | [<code>InstancedSpriteOptions</code>](#InstancedSpriteOptions) | 初始化配置项 |
+
 <a name="InstancedSpriteCollection+remove"></a>
 
 ### instancedSpriteCollection.remove(sprite) ⇒ [<code>InstancedSpriteCollection</code>](#InstancedSpriteCollection)
@@ -392,6 +398,17 @@ InstancedSprite实例数量
 移除所有InstancedSprite，并清空所有Mesh的实例数据（Mesh本身保留以便复用）
 
 **Kind**: instance method of [<code>InstancedSpriteCollection</code>](#InstancedSpriteCollection)  
+<a name="InstancedSpriteCollection+reserve"></a>
+
+### instancedSpriteCollection.reserve(capacity) ⇒ [<code>InstancedSpriteCollection</code>](#InstancedSpriteCollection)
+预分配所有Mesh的容量，避免后续动态扩容（适用于提前知道大致实例数量的场景）
+
+**Kind**: instance method of [<code>InstancedSpriteCollection</code>](#InstancedSpriteCollection)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| capacity | <code>number</code> | 需要预留的实例数量 |
+
 <a name="InstancedSpriteCollection+forEach"></a>
 
 ### instancedSpriteCollection.forEach(callback) ⇒ [<code>InstancedSpriteCollection</code>](#InstancedSpriteCollection)
@@ -439,9 +456,11 @@ InstancedSpriteMesh类，基于InstancedBufferGeometry实现的高性能Instance
 * [InstancedSpriteMesh](#InstancedSpriteMesh) ⇐ <code>Mesh</code>
     * [new InstancedSpriteMesh(collection, texture)](#new_InstancedSpriteMesh_new)
     * [.type](#InstancedSpriteMesh+type) : <code>string</code>
+    * [.frustumCulled](#InstancedSpriteMesh+frustumCulled) : <code>boolean</code>
     * [.isInstancedSpriteMesh](#InstancedSpriteMesh+isInstancedSpriteMesh) : <code>boolean</code>
     * [.depthTest](#InstancedSpriteMesh+depthTest) : <code>boolean</code>
     * [.instancedSprites](#InstancedSpriteMesh+instancedSprites) : [<code>Array.&lt;InstancedSprite&gt;</code>](#InstancedSprite)
+    * [.reserve(capacity)](#InstancedSpriteMesh+reserve) ⇒ [<code>InstancedSpriteMesh</code>](#InstancedSpriteMesh)
     * [.add(sprite)](#InstancedSpriteMesh+add) ⇒ [<code>InstancedSpriteMesh</code>](#InstancedSpriteMesh)
     * [.remove(sprite)](#InstancedSpriteMesh+remove) ⇒ [<code>InstancedSpriteMesh</code>](#InstancedSpriteMesh)
     * [.clear()](#InstancedSpriteMesh+clear) ⇒ [<code>InstancedSpriteMesh</code>](#InstancedSpriteMesh)
@@ -463,6 +482,13 @@ InstancedSpriteMesh类，基于InstancedBufferGeometry实现的高性能Instance
 
 **Kind**: instance property of [<code>InstancedSpriteMesh</code>](#InstancedSpriteMesh)  
 **Read only**: true  
+<a name="InstancedSpriteMesh+frustumCulled"></a>
+
+### instancedSpriteMesh.frustumCulled : <code>boolean</code>
+实例化几何体的包围球基于单位四边形（位于原点），不包含实例位置，视锥剔除会把远离原点的实例整批误剔除，因此禁用
+
+**Kind**: instance property of [<code>InstancedSpriteMesh</code>](#InstancedSpriteMesh)  
+**Default**: <code>false</code>  
 <a name="InstancedSpriteMesh+isInstancedSpriteMesh"></a>
 
 ### instancedSpriteMesh.isInstancedSpriteMesh : <code>boolean</code>
@@ -484,6 +510,17 @@ InstancedSprite对象数组
 
 **Kind**: instance property of [<code>InstancedSpriteMesh</code>](#InstancedSpriteMesh)  
 **Read only**: true  
+<a name="InstancedSpriteMesh+reserve"></a>
+
+### instancedSpriteMesh.reserve(capacity) ⇒ [<code>InstancedSpriteMesh</code>](#InstancedSpriteMesh)
+预分配容量，避免后续动态扩容（不改变当前实际绘制的实例数量）
+
+**Kind**: instance method of [<code>InstancedSpriteMesh</code>](#InstancedSpriteMesh)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| capacity | <code>number</code> | 需要预留的实例数量 |
+
 <a name="InstancedSpriteMesh+add"></a>
 
 ### instancedSpriteMesh.add(sprite) ⇒ [<code>InstancedSpriteMesh</code>](#InstancedSpriteMesh)

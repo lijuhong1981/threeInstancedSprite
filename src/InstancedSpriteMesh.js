@@ -51,6 +51,30 @@ const AttributesItemSize = Object.freeze({
     aPickColorAndEnabled: 4,
 });
 /**
+ * 将指定实例的属性片段标记为需要更新，仅上传该实例对应的数据范围（增量上传）
+ * @param {InstancedSpriteMesh} mesh
+ * @param {string} name - attribute名称
+ * @param {number} index - 实例索引
+ * @param {number} itemSize - 单个实例占用的float数量
+ * @ignore
+*/
+function markUpdateRange(mesh, name, index, itemSize) {
+    const attribute = mesh.geometry.attributes[name];
+    attribute.addUpdateRange(index * itemSize, itemSize);
+    attribute.needsUpdate = true;
+}
+/**
+ * 将指定实例属性标记为全量更新（整块重传）
+ * @param {InstancedSpriteMesh} mesh
+ * @param {string} name - attribute名称
+ * @ignore
+*/
+function markFullUpdate(mesh, name) {
+    const attribute = mesh.geometry.attributes[name];
+    attribute.clearUpdateRanges();
+    attribute.needsUpdate = true;
+}
+/**
  * 检查并更新一个InstancedSprite实例的数据到对应的InstancedBufferAttribute位置
  * @param {InstancedSpriteMesh} mesh 
  * @param {InstancedSprite} sprite
@@ -86,7 +110,7 @@ function checkAndUpdateInstancedSprite(mesh, sprite) {
             sprite._show = sprite.show;
             attributesData.aPositionAndShow[idx + 3] = sprite._show ? 1 : 0;
         }
-        mesh.geometry.attributes.aPositionAndShow.needsUpdate = true;
+        markUpdateRange(mesh, 'aPositionAndShow', index, AttributesItemSize.aPositionAndShow);
     }
 
     if (centerChanged || imageSizeChanged) {
@@ -101,7 +125,7 @@ function checkAndUpdateInstancedSprite(mesh, sprite) {
             attributesData.aCenterAndSize[idx + 2] = sprite._imageSize.x;
             attributesData.aCenterAndSize[idx + 3] = sprite._imageSize.y;
         }
-        mesh.geometry.attributes.aCenterAndSize.needsUpdate = true;
+        markUpdateRange(mesh, 'aCenterAndSize', index, AttributesItemSize.aCenterAndSize);
     }
 
     if (scaleChanged || rotationChanged || sizeAttenuationChanged) {
@@ -118,7 +142,7 @@ function checkAndUpdateInstancedSprite(mesh, sprite) {
             sprite._sizeAttenuation = sprite.sizeAttenuation;
             attributesData.aScaleAndRotationAndSizeAttenuation[idx + 2] = sprite._sizeAttenuation ? 1 : 0;
         }
-        mesh.geometry.attributes.aScaleAndRotationAndSizeAttenuation.needsUpdate = true;
+        markUpdateRange(mesh, 'aScaleAndRotationAndSizeAttenuation', index, AttributesItemSize.aScaleAndRotationAndSizeAttenuation);
     }
 
     if (colorChanged || opacityChanged) {
@@ -133,7 +157,7 @@ function checkAndUpdateInstancedSprite(mesh, sprite) {
             sprite._opacity = sprite.opacity;
             attributesData.aColorAndOpacity[idx + 3] = sprite._opacity;
         }
-        mesh.geometry.attributes.aColorAndOpacity.needsUpdate = true;
+        markUpdateRange(mesh, 'aColorAndOpacity', index, AttributesItemSize.aColorAndOpacity);
     }
 
     if (pickColorChanged || enablePickColorChanged) {
@@ -148,7 +172,7 @@ function checkAndUpdateInstancedSprite(mesh, sprite) {
             sprite._enablePickColor = sprite.enablePickColor;
             attributesData.aPickColorAndEnabled[idx + 3] = sprite._enablePickColor ? 1 : 0;
         }
-        mesh.geometry.attributes.aPickColorAndEnabled.needsUpdate = true;
+        markUpdateRange(mesh, 'aPickColorAndEnabled', index, AttributesItemSize.aPickColorAndEnabled);
     }
 };
 /**
@@ -170,7 +194,7 @@ function addInstancedSprite(mesh, sprite, index) {
     attributesData.aPositionAndShow[idx + 2] = sprite._position.z;
     sprite._show = sprite.show;
     attributesData.aPositionAndShow[idx + 3] = sprite._show ? 1 : 0;
-    mesh.geometry.attributes.aPositionAndShow.needsUpdate = true;
+    markFullUpdate(mesh, 'aPositionAndShow');
 
     idx = index * AttributesItemSize.aCenterAndSize;
     sprite._center.copy(sprite.center);
@@ -179,7 +203,7 @@ function addInstancedSprite(mesh, sprite, index) {
     sprite._imageSize.copy(sprite.imageSize);
     attributesData.aCenterAndSize[idx + 2] = sprite._imageSize.x;
     attributesData.aCenterAndSize[idx + 3] = sprite._imageSize.y;
-    mesh.geometry.attributes.aCenterAndSize.needsUpdate = true;
+    markFullUpdate(mesh, 'aCenterAndSize');
 
     idx = index * AttributesItemSize.aScaleAndRotationAndSizeAttenuation;
     sprite._scale = sprite.scale;
@@ -188,7 +212,7 @@ function addInstancedSprite(mesh, sprite, index) {
     attributesData.aScaleAndRotationAndSizeAttenuation[idx + 1] = sprite._rotation;
     sprite._sizeAttenuation = sprite.sizeAttenuation;
     attributesData.aScaleAndRotationAndSizeAttenuation[idx + 2] = sprite._sizeAttenuation ? 1 : 0;
-    mesh.geometry.attributes.aScaleAndRotationAndSizeAttenuation.needsUpdate = true;
+    markFullUpdate(mesh, 'aScaleAndRotationAndSizeAttenuation');
 
     idx = index * AttributesItemSize.aColorAndOpacity;
     sprite._color.copy(sprite.color);
@@ -197,7 +221,7 @@ function addInstancedSprite(mesh, sprite, index) {
     attributesData.aColorAndOpacity[idx + 2] = sprite._color.b;
     sprite._opacity = sprite.opacity;
     attributesData.aColorAndOpacity[idx + 3] = sprite._opacity;
-    mesh.geometry.attributes.aColorAndOpacity.needsUpdate = true;
+    markFullUpdate(mesh, 'aColorAndOpacity');
 };
 
 /**
@@ -223,6 +247,12 @@ class InstancedSpriteMesh extends Mesh {
          * @readonly
         */
         this.type = "InstancedSpriteMesh";
+        /**
+         * 实例化几何体的包围球基于单位四边形（位于原点），不包含实例位置，视锥剔除会把远离原点的实例整批误剔除，因此禁用
+         * @type {boolean}
+         * @default false
+        */
+        this.frustumCulled = false;
         /**
          * @type {Array<InstancedSprite>}
          * @ignore
@@ -250,7 +280,9 @@ class InstancedSpriteMesh extends Mesh {
          * @ignore
         */
         this._maxCapacity = 0;
-        this._enaureCapacity(64);
+        this._ensureCapacity(1024);
+        // 初始无实例，绘制数量为0（_ensureCapacity 只负责扩容，不改变实例数量）
+        this.geometry.instanceCount = 0;
     }
     /**
      * InstancedSpriteMesh对象标识
@@ -279,29 +311,35 @@ class InstancedSpriteMesh extends Mesh {
      * @param {number} required - 需要容纳的InstancedSprite数量
      * @private
     */
-    _enaureCapacity(required) {
-        if (required < this._maxCapacity) return;
+    _ensureCapacity(required) {
+        if (required <= this._maxCapacity) return;
 
-        const newCapacity = Math.max(required, this._maxCapacity + 64);
+        // 线性扩容（+1024）保证内存浪费有界；Three.js 不支持原地扩容 buffer，需新建数组与 attribute
+        const newCapacity = Math.max(required, this._maxCapacity + 1024);
 
         for (const [name, itemSize] of Object.entries(AttributesItemSize)) {
-            const newArray = new Float32Array(newCapacity * itemSize);
             const oldArray = this._attributesData[name];
+            const newArray = new Float32Array(newCapacity * itemSize);
             if (oldArray) {
-                const copyLen = Math.min(oldArray.length, newArray.length);
-                newArray.set(oldArray.subarray(0, copyLen));
+                newArray.set(oldArray.subarray(0, Math.min(oldArray.length, newArray.length)));
             }
             this._attributesData[name] = newArray;
+
+            const attribute = new InstancedBufferAttribute(newArray, itemSize);
+            this.geometry.setAttribute(name, attribute);
         }
 
-        // 创建 InstancedBufferAttribute 对象
-        for (const [name, itemSize] of Object.entries(AttributesItemSize)) {
-            const attr = new InstancedBufferAttribute(this._attributesData[name], itemSize);
-            this.geometry.setAttribute(name, attr);
-        }
-
-        this.geometry.instanceCount = required;
         this._maxCapacity = newCapacity;
+    }
+    /**
+     * 预分配容量，避免后续动态扩容（不改变当前实际绘制的实例数量）
+     * @param {number} capacity - 需要预留的实例数量
+     * @returns {InstancedSpriteMesh}
+    */
+    reserve(capacity) {
+        Check.typeOf.number('capacity', capacity);
+        this._ensureCapacity(capacity);
+        return this;
     }
     /**
      * 添加一个InstancedSprite
@@ -369,7 +407,7 @@ class InstancedSpriteMesh extends Mesh {
 
         // 计算最终需要的容量
         const requiredCapacity = instancedSprites.length + addInstancedSprites.length - removeInstancedSprites.length;
-        this._enaureCapacity(requiredCapacity);
+        this._ensureCapacity(requiredCapacity);
 
         if (removeInstancedSprites.length > 0) {
             // 如果有需要移除的InstancedSprite，先从instancedSprites数组中移除
