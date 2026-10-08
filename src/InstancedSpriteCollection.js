@@ -188,6 +188,22 @@ class InstancedSpriteCollection extends Object3D {
         return this;
     }
     /**
+     * 移除所有InstancedSprite，并清空所有Mesh的实例数据（Mesh本身保留以便复用）
+     * @returns {InstancedSpriteCollection}
+    */
+    clear() {
+        for (const sprite of this._instancedSprites) {
+            sprite._mesh = undefined;
+            sprite._instanceIndex = -1;
+        }
+        this._instancedSprites.length = 0;
+        const meshes = this._meshes.values();
+        for (const mesh of meshes) {
+            mesh.clear();
+        }
+        return this;
+    }
+    /**
      * 遍历所有的InstancedSprite
      * @param {Function} callback
      * @returns {InstancedSpriteCollection}

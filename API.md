@@ -282,6 +282,7 @@ InstancedSpriteCollection类，批量管理InstancedSprite实例
     * [.getByUuid(uuid)](#InstancedSpriteCollection+getByUuid) ⇒ [<code>InstancedSprite</code>](#InstancedSprite) \| <code>undefined</code>
     * [.add()](#InstancedSpriteCollection+add) ⇒ [<code>InstancedSprite</code>](#InstancedSprite)
     * [.remove(sprite)](#InstancedSpriteCollection+remove) ⇒ [<code>InstancedSpriteCollection</code>](#InstancedSpriteCollection)
+    * [.clear()](#InstancedSpriteCollection+clear) ⇒ [<code>InstancedSpriteCollection</code>](#InstancedSpriteCollection)
     * [.forEach(callback)](#InstancedSpriteCollection+forEach) ⇒ [<code>InstancedSpriteCollection</code>](#InstancedSpriteCollection)
     * [.raycast(raycaster, intersects)](#InstancedSpriteCollection+raycast)
 
@@ -385,6 +386,12 @@ InstancedSprite实例数量
 | --- | --- |
 | sprite | [<code>InstancedSprite</code>](#InstancedSprite) | 
 
+<a name="InstancedSpriteCollection+clear"></a>
+
+### instancedSpriteCollection.clear() ⇒ [<code>InstancedSpriteCollection</code>](#InstancedSpriteCollection)
+移除所有InstancedSprite，并清空所有Mesh的实例数据（Mesh本身保留以便复用）
+
+**Kind**: instance method of [<code>InstancedSpriteCollection</code>](#InstancedSpriteCollection)  
 <a name="InstancedSpriteCollection+forEach"></a>
 
 ### instancedSpriteCollection.forEach(callback) ⇒ [<code>InstancedSpriteCollection</code>](#InstancedSpriteCollection)
