@@ -5,6 +5,11 @@
   "type": "module",
   "module": "index.js",
   "main": "index.js",
+  "files": [
+    "index.js",
+    "src/",
+    "API.md"
+  ],
   "publishConfig": {
     "access": "public"
   },
