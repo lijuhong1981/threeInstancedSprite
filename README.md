@@ -79,6 +79,22 @@ if (intersects.length > 0) {
 }
 ```
 
+## Billboard 别名
+
+所有 `InstancedSprite*` 类都有对应的 `Billboard*` 别名导出，语义上表示「始终面向相机的广告牌/标签」，用法完全一致：
+
+```js
+import { BillboardCollection, Billboard } from "@lijuhong1981/three.instancedsprite";
+
+// BillboardCollection === InstancedSpriteCollection
+const collection = new BillboardCollection();
+scene.add(collection);
+
+// Billboard === InstancedSprite
+const billboard = collection.add({ image: './res/icon.png', position: [0, 0, 0] });
+console.log(billboard instanceof Billboard); // true
+```
+
 ## 主要 API
 
 | 类 | 说明 |
