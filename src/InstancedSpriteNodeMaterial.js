@@ -85,8 +85,8 @@ class InstancedSpriteNodeMaterial extends NodeMaterial {
 
             If(isVisible, () => {
                 // --- 4. sizeAttenuation：大小跟随相机深度 ---
-                // 检查是否为透视投影: 透视投影矩阵中 m[2][3] (elements[11]) == -1
-                const scaleFactor = sizeAttenuation.lessThan(0.5).and(cameraProjectionMatrix.element(11).equal(-1))
+                // 检查是否为透视投影：透视投影矩阵 m[2][3] (elements[11]) == -1
+                const scaleFactor = sizeAttenuation.lessThan(0.5).and(cameraProjectionMatrix.element(2).w.equal(-1))
                     .select(scale.mul(depth), scale);
 
                 // --- 5. 坐标对齐 ---
@@ -120,7 +120,7 @@ class InstancedSpriteNodeMaterial extends NodeMaterial {
             });
 
             return clipPosition;
-        }).once();
+        }).once()();
 
         // ============================================================
         // 片元着色器 (fragmentNode)
@@ -146,7 +146,7 @@ class InstancedSpriteNodeMaterial extends NodeMaterial {
             });
 
             return diffuseColor;
-        }).once();
+        }).once()();
     }
     /**
      * 图片纹理
