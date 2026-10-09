@@ -27,14 +27,14 @@ const imageCache = new Map();
  */
 class InstancedSpriteCollection extends Object3D {
     /**
-     * @param {boolean} [useNodeMaterial=false] - 是否使用TSL的NodeMaterial（WebGPU），默认false
-     * @param {object} [options] - 图集配置项
+     * @param {object} [options] - 配置项
+     * @param {boolean} [options.useNodeMaterial=false] - 是否使用TSL的NodeMaterial（WebGPU），默认false
      * @param {number} [options.initialSize=1024] - 图集初始边长
      * @param {number} [options.maxSize=8192] - 图集最大边长
      * @param {number} [options.padding=2] - 子图间距
      * @constructor
     */
-    constructor(useNodeMaterial = false, options = {}) {
+    constructor(options = {}) {
         super();
         /**
          * 是否使用TSL的NodeMaterial，默认false
@@ -42,7 +42,7 @@ class InstancedSpriteCollection extends Object3D {
          * @readonly
          * @default false
         */
-        this.useNodeMaterial = useNodeMaterial;
+        this.useNodeMaterial = options.useNodeMaterial === true;
         /**
          * 对象类型标识
          * @type {string}
@@ -366,3 +366,9 @@ class InstancedSpriteCollection extends Object3D {
 
 export default InstancedSpriteCollection;
 export { InstancedSpriteCollection };
+/**
+ * InstancedSpriteCollection 的别名。
+ * @class
+ * @name BillboardCollection
+ */
+export const BillboardCollection = InstancedSpriteCollection;

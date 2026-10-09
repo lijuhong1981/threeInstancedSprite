@@ -162,3 +162,9 @@ class InstancedSpriteNodeMaterial extends NodeMaterial {
 
 export default InstancedSpriteNodeMaterial;
 export { InstancedSpriteNodeMaterial };
+/**
+ * InstancedSpriteNodeMaterial 的别名。
+ * @class
+ * @name BillboardNodeMaterial
+ */
+export const BillboardNodeMaterial = InstancedSpriteNodeMaterial;

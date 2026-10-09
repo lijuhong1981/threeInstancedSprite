@@ -146,3 +146,9 @@ class InstancedSpriteMaterial extends ShaderMaterial {
 
 export default InstancedSpriteMaterial;
 export { InstancedSpriteMaterial };
+/**
+ * InstancedSpriteMaterial 的别名。
+ * @class
+ * @name BillboardMaterial
+ */
+export const BillboardMaterial = InstancedSpriteMaterial;

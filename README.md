@@ -2,12 +2,12 @@
 
 Three.js 自带的 `Sprite` 不支持 GPU 实例化渲染。当场景中需要同时展示大量标签、图标或提示时，逐个绘制 `Sprite` 会产生大量 draw call，导致帧率明显下降。
 
-`InstancedSprite` 基于 `InstancedBufferGeometry` + 自定义 `ShaderMaterial`（或 TSL `NodeMaterial`）实现实例化渲染。**相同图片的 Sprite 会自动合并到同一个 Mesh，一次 draw call 全部绘制**，极大提升大批量标签的渲染效率。
+`InstancedSprite` 基于 `InstancedBufferGeometry` + 自定义 `ShaderMaterial`（或 TSL `NodeMaterial`）实现实例化渲染。**所有 Sprite 的图片打包进纹理图集，合并为极少数 draw call**，极大提升大批量标签的渲染效率。
 
 ## 特性
 
 - 🚀 **GPU 实例化**：基于 `InstancedBufferGeometry`，数千个 Sprite 仅需一次 draw call
-- 🏷️ **按图自动合批**：`image` 相同的 Sprite 自动归入同一个 `InstancedSpriteMesh` 统一渲染
+- 🏷️ **纹理图集合批**：不同图片打包进同一图集，一个图集（一个 Mesh）一次 draw call；图集满自动新建
 - ✏️ **属性自动同步**：直接修改 Sprite 的 `position` / `rotation` / `scale` / `color` 等属性，每帧 `update()` 时通过脏检查自动上传至 GPU，无需手动刷新
 - 🎯 **射线拾取**：内置射线检测，可直接用 `Raycaster` 拾取到具体的 `InstancedSprite` 实例
 - 🖼️ **像素级透明**：片元着色器自动丢弃完全透明的像素
@@ -32,8 +32,11 @@ import { InstancedSpriteCollection } from "@lijuhong1981/three.instancedsprite";
 const collection = new InstancedSpriteCollection();
 scene.add(collection);
 
-// 若使用 WebGPURenderer，传入 true 以启用 TSL 的 NodeMaterial
-// const collection = new InstancedSpriteCollection(true);
+// 若使用 WebGPURenderer，通过 useNodeMaterial 启用 TSL 的 NodeMaterial
+// const collection = new InstancedSpriteCollection({ useNodeMaterial: true });
+
+// 图集可配置（初始/最大边长、子图间距），默认自动扩容到 8192
+// const collection = new InstancedSpriteCollection({ maxSize: 4096 });
 
 // 每帧更新：内部做脏检查，把发生变化的属性同步到 GPU
 const onAnimate = () => {
@@ -80,11 +83,13 @@ if (intersects.length > 0) {
 
 | 类 | 说明 |
 | --- | --- |
-| `InstancedSpriteCollection` | 继承自 `Object3D`，批量管理所有 Sprite；按 `image` 分组并生成对应的 `InstancedSpriteMesh` |
+| `InstancedSpriteCollection` | 继承自 `Object3D`，批量管理所有 Sprite；使用纹理图集合并 draw call |
 | `InstancedSprite` | 数据模型类，保存单个 Sprite 的全部属性；**不继承 `Object3D`**，不能直接加入 Scene，由 Collection 统一渲染 |
-| `InstancedSpriteMesh` | 继承自 `Mesh`，基于 `InstancedBufferGeometry`，同一图片的所有 Sprite 由其统一绘制 |
+| `InstancedSpriteMesh` | 继承自 `Mesh`，基于 `InstancedBufferGeometry`，一张图集对应一个 Mesh，由其统一绘制 |
 | `InstancedSpriteMaterial` | 继承自 `ShaderMaterial`，以 instanced attribute 形式接收每个 Sprite 的属性（WebGL） |
 | `InstancedSpriteNodeMaterial` | 继承自 `NodeMaterial`，基于 TSL 实现，功能与 `InstancedSpriteMaterial` 一致（WebGPU） |
+
+> 以上每个类都有对应的 `Billboard*` 别名导出（如 `BillboardCollection`、`Billboard`），语义上表示「始终面向相机的广告牌/标签」。
 
 ### InstancedSpriteCollection
 
@@ -117,7 +122,7 @@ if (intersects.length > 0) {
 
 ## 工作原理
 
-1. `InstancedSpriteCollection.add()` 创建 `InstancedSprite` 数据对象，并根据其 `image` 找到（或新建）对应的 `InstancedSpriteMesh`。
+1. `InstancedSpriteCollection.add()` 创建 `InstancedSprite` 数据对象，并将其 `image` 打包进纹理图集（同一图片只打包一次）。
 2. `InstancedSpriteMesh` 持有 `InstancedBufferGeometry`，为每个实例分配一组 instanced attribute（位置+显示、锚点+尺寸、缩放+旋转+衰减、颜色+透明度、拾取颜色）。
 3. 顶点着色器根据实例属性计算 billboard 位置（对齐、旋转、透视缩放），片元着色器采样纹理并应用颜色 / 透明度。
 4. 每帧调用 `update()`：仅当属性实际发生变化（脏检查）时才更新对应缓冲区，减少 CPU→GPU 传输开销；缓冲区按需自动扩容。

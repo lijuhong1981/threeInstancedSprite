@@ -8,6 +8,8 @@
 <li>但它可以作为属性Module使用，修改InstancedSprite的属性会自动更新至GPU中</li>
 </ul>
 </dd>
+<dt><a href="#Billboard">Billboard</a></dt>
+<dd></dd>
 <dt><a href="#InstancedSpriteCollection">InstancedSpriteCollection</a> ⇐ <code>Object3D</code></dt>
 <dd><p>InstancedSpriteCollection类，批量管理InstancedSprite实例</p>
 <ul>
@@ -16,19 +18,27 @@
 <li>图集扩容到上限后会新建图集与 Mesh</li>
 </ul>
 </dd>
+<dt><a href="#BillboardCollection">BillboardCollection</a></dt>
+<dd></dd>
 <dt><a href="#InstancedSpriteMaterial">InstancedSpriteMaterial</a> ⇐ <code>ShaderMaterial</code></dt>
 <dd><p>InstancedSprite 材质类，以attribute形式传入InstancedSprite对象实例属性</p>
 </dd>
+<dt><a href="#BillboardMaterial">BillboardMaterial</a></dt>
+<dd></dd>
 <dt><a href="#InstancedSpriteMesh">InstancedSpriteMesh</a> ⇐ <code>Mesh</code></dt>
 <dd><p>InstancedSpriteMesh类，基于InstancedBufferGeometry实现的高性能InstancedSprite渲染组件</p>
 <p>一张图集纹理对应一个 InstancedSpriteMesh，所有使用该图集的 Sprite 由其统一绘制</p>
 </dd>
+<dt><a href="#BillboardMesh">BillboardMesh</a></dt>
+<dd></dd>
 <dt><a href="#InstancedSpriteNodeMaterial">InstancedSpriteNodeMaterial</a> ⇐ <code>NodeMaterial</code></dt>
 <dd><p>InstancedSpriteNodeMaterial 材质类，基于 Three.js TSL (Three Shading Language) 语法实现</p>
 <p>功能与 InstancedSpriteMaterial (ShaderMaterial) 完全相同，但使用 TSL 节点系统构建，
 可更好地与 Three.js 的 NodeMaterial 管线集成（自动处理色调映射、色彩空间转换等）。</p>
 <p><strong>注意</strong>：使用此类需要 Three.js 的 WebGPU/TSL 构建（<code>three/webgpu</code>），非标准 <code>three</code> 构建。</p>
 </dd>
+<dt><a href="#BillboardNodeMaterial">BillboardNodeMaterial</a></dt>
+<dd></dd>
 <dt><a href="#TextureAtlas">TextureAtlas</a></dt>
 <dd><p>纹理图集，将多张图片按行（shelf）打包进一张 Canvas 纹理，用于合并 draw call</p>
 </dd>
@@ -261,6 +271,15 @@ Computes intersection points between a casted ray and this sprite.
 | intersects | <code>Array.&lt;Object&gt;</code> | The target array that holds the intersection points. |
 | modelViewMatrix | <code>Matrix4</code> |  |
 
+<a name="Billboard"></a>
+
+## Billboard
+**Kind**: global class  
+<a name="new_Billboard_new"></a>
+
+### new Billboard()
+InstancedSprite 的别名（广告牌语义）。
+
 <a name="InstancedSpriteCollection"></a>
 
 ## InstancedSpriteCollection ⇐ <code>Object3D</code>
@@ -274,7 +293,7 @@ InstancedSpriteCollection类，批量管理InstancedSprite实例
 **Extends**: <code>Object3D</code>  
 
 * [InstancedSpriteCollection](#InstancedSpriteCollection) ⇐ <code>Object3D</code>
-    * [new InstancedSpriteCollection([useNodeMaterial], [options])](#new_InstancedSpriteCollection_new)
+    * [new InstancedSpriteCollection([options])](#new_InstancedSpriteCollection_new)
     * [.useNodeMaterial](#InstancedSpriteCollection+useNodeMaterial) : <code>boolean</code>
     * [.type](#InstancedSpriteCollection+type) : <code>string</code>
     * [.isInstancedSpriteCollection](#InstancedSpriteCollection+isInstancedSpriteCollection) : <code>boolean</code>
@@ -291,15 +310,16 @@ InstancedSpriteCollection类，批量管理InstancedSprite实例
     * [.reserve(capacity)](#InstancedSpriteCollection+reserve) ⇒ [<code>InstancedSpriteCollection</code>](#InstancedSpriteCollection)
     * [.forEach(callback)](#InstancedSpriteCollection+forEach) ⇒ [<code>InstancedSpriteCollection</code>](#InstancedSpriteCollection)
     * [.raycast(raycaster, intersects)](#InstancedSpriteCollection+raycast)
+    * [.dispose()](#InstancedSpriteCollection+dispose) ⇒ [<code>InstancedSpriteCollection</code>](#InstancedSpriteCollection)
 
 <a name="new_InstancedSpriteCollection_new"></a>
 
-### new InstancedSpriteCollection([useNodeMaterial], [options])
+### new InstancedSpriteCollection([options])
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
-| [useNodeMaterial] | <code>boolean</code> | <code>false</code> | 是否使用TSL的NodeMaterial（WebGPU），默认false |
-| [options] | <code>object</code> |  | 图集配置项 |
+| [options] | <code>object</code> |  | 配置项 |
+| [options.useNodeMaterial] | <code>boolean</code> | <code>false</code> | 是否使用TSL的NodeMaterial（WebGPU），默认false |
 | [options.initialSize] | <code>number</code> | <code>1024</code> | 图集初始边长 |
 | [options.maxSize] | <code>number</code> | <code>8192</code> | 图集最大边长 |
 | [options.padding] | <code>number</code> | <code>2</code> | 子图间距 |
@@ -448,6 +468,21 @@ Computes intersection points between a casted ray and this sprite.
 | raycaster | <code>Raycaster</code> | The raycaster. |
 | intersects | <code>Array.&lt;Object&gt;</code> | The target array that holds the intersection points. |
 
+<a name="InstancedSpriteCollection+dispose"></a>
+
+### instancedSpriteCollection.dispose() ⇒ [<code>InstancedSpriteCollection</code>](#InstancedSpriteCollection)
+释放所有 GPU 资源（几何体、材质、图集纹理），并移除所有子 Mesh
+
+**Kind**: instance method of [<code>InstancedSpriteCollection</code>](#InstancedSpriteCollection)  
+<a name="BillboardCollection"></a>
+
+## BillboardCollection
+**Kind**: global class  
+<a name="new_BillboardCollection_new"></a>
+
+### new BillboardCollection()
+InstancedSpriteCollection 的别名。
+
 <a name="InstancedSpriteMaterial"></a>
 
 ## InstancedSpriteMaterial ⇐ <code>ShaderMaterial</code>
@@ -461,6 +496,15 @@ InstancedSprite 材质类，以attribute形式传入InstancedSprite对象实例�
 图片纹理
 
 **Kind**: instance property of [<code>InstancedSpriteMaterial</code>](#InstancedSpriteMaterial)  
+<a name="BillboardMaterial"></a>
+
+## BillboardMaterial
+**Kind**: global class  
+<a name="new_BillboardMaterial_new"></a>
+
+### new BillboardMaterial()
+InstancedSpriteMaterial 的别名。
+
 <a name="InstancedSpriteMesh"></a>
 
 ## InstancedSpriteMesh ⇐ <code>Mesh</code>
@@ -594,6 +638,15 @@ Computes intersection points between a casted ray and this sprite.
 释放 GPU 资源
 
 **Kind**: instance method of [<code>InstancedSpriteMesh</code>](#InstancedSpriteMesh)  
+<a name="BillboardMesh"></a>
+
+## BillboardMesh
+**Kind**: global class  
+<a name="new_BillboardMesh_new"></a>
+
+### new BillboardMesh()
+InstancedSpriteMesh 的别名。
+
 <a name="InstancedSpriteNodeMaterial"></a>
 
 ## InstancedSpriteNodeMaterial ⇐ <code>NodeMaterial</code>
@@ -612,6 +665,15 @@ InstancedSpriteNodeMaterial 材质类，基于 Three.js TSL (Three Shading Langu
 图片纹理
 
 **Kind**: instance property of [<code>InstancedSpriteNodeMaterial</code>](#InstancedSpriteNodeMaterial)  
+<a name="BillboardNodeMaterial"></a>
+
+## BillboardNodeMaterial
+**Kind**: global class  
+<a name="new_BillboardNodeMaterial_new"></a>
+
+### new BillboardNodeMaterial()
+InstancedSpriteNodeMaterial 的别名。
+
 <a name="TextureAtlas"></a>
 
 ## TextureAtlas

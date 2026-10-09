@@ -373,3 +373,9 @@ class InstancedSprite {
 
 export default InstancedSprite;
 export { InstancedSprite };
+/**
+ * InstancedSprite 的别名（广告牌语义）。
+ * @class
+ * @name Billboard
+ */
+export const Billboard = InstancedSprite;

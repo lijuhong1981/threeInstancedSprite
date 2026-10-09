@@ -502,3 +502,9 @@ class InstancedSpriteMesh extends Mesh {
 
 export default InstancedSpriteMesh;
 export { InstancedSpriteMesh };
+/**
+ * InstancedSpriteMesh 的别名。
+ * @class
+ * @name BillboardMesh
+ */
+export const BillboardMesh = InstancedSpriteMesh;

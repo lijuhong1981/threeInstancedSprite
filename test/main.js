@@ -50,7 +50,7 @@ let picked = null;
 function createCollection() {
     // 小图集：初始 128、上限 256，24 种图标会溢出到多个图集 -> 多个 Mesh
     const options = useSmallAtlas ? { initialSize: 128, maxSize: 256, padding: 2 } : {};
-    return new InstancedSpriteCollection(false, options);
+    return new InstancedSpriteCollection(options);
 }
 
 function randomSprite() {
