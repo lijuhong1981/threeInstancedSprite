@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InstancedSprite 功能测试</title>
+    <style>
+        * { box-sizing: border-box; }
+        html, body { margin: 0; height: 100%; overflow: hidden; font-family: -apple-system, "Microsoft YaHei", sans-serif; }
+        canvas { display: block; }
+        #panel {
+            position: fixed; top: 12px; left: 12px; z-index: 10;
+            background: rgba(20, 22, 42, 0.85); color: #eaeaf4;
+            padding: 12px 14px; border-radius: 8px; font-size: 13px; line-height: 1.7;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.4); user-select: none;
+        }
+        #panel h1 { margin: 0 0 6px; font-size: 15px; }
+        #panel .stat { font-variant-numeric: tabular-nums; }
+        #panel button {
+            margin: 3px 3px 0 0; padding: 4px 10px; border: 1px solid #4a4d6e;
+            background: #2a2d4a; color: #eaeaf4; border-radius: 4px; cursor: pointer; font-size: 12px;
+        }
+        #panel button:hover { background: #383b5e; }
+        #hint { margin-top: 6px; color: #9aa0c0; font-size: 12px; }
+    </style>
+</head>
+<body>
+    <div id="panel">
+        <h1>InstancedSprite 测试</h1>
+        <div class="stat">sprites: <span id="count">0</span></div>
+        <div class="stat">draw calls: <span id="drawcalls">0</span></div>
+        <div class="stat">fps: <span id="fps">0</span></div>
+        <div>
+            <button id="addBtn">+500</button>
+            <button id="removeBtn">-500</button>
+            <button id="clearBtn">清空</button>
+        </div>
+        <div>
+            <button id="smallAtlasBtn">小图集: off</button>
+        </div>
+        <div>
+            <button id="depthTestBtn">depthTest: on</button>
+            <button id="depthWriteBtn">depthWrite: on</button>
+        </div>
+        <div id="hint">拖拽旋转视角 · 点击 sprite 高亮拾取 · 开「小图集」时 24 种图标溢出到多个图集，draw calls 会 &gt; 1</div>
+    </div>
+    <script type="module" src="./main.js"></script>
+</body>
+</html>
