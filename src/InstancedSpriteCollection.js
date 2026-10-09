@@ -66,6 +66,12 @@ class InstancedSpriteCollection extends Object3D {
         */
         this._atlasList = [];
         /**
+         * 图片源到所在图集条目的索引，避免同一张图片被重复打包进不同图集
+         * @type {Map<HTMLImageElement|HTMLCanvasElement, {atlas:TextureAtlas, mesh:InstancedSpriteMesh}>}
+         * @ignore
+        */
+        this._imageEntry = new Map();
+        /**
          * 图集配置项，新建图集时使用
          * @type {object}
          * @ignore
@@ -163,21 +169,29 @@ class InstancedSpriteCollection extends Object3D {
      * @private
     */
     _assignAtlas(source, sprite) {
-        let entry = this._atlasList[this._atlasList.length - 1];
-        let rect = entry ? entry.atlas.add(source) : null;
-        if (rect === null && entry) {
-            // 图集已满，尝试扩容
-            if (entry.atlas.grow()) {
-                this._recomputeUvRects(entry);
+        // 已打包过的图片复用其所在图集，避免把同一张图重复打进不同图集
+        let entry = this._imageEntry.get(source);
+        if (!entry) {
+            entry = this._atlasList[this._atlasList.length - 1];
+            let rect = entry ? entry.atlas.add(source) : null;
+            if (rect === null && entry) {
+                // 图集已满，尝试扩容
+                if (entry.atlas.grow()) {
+                    // 扩容会重建纹理，需同步更新 Mesh 材质引用的纹理
+                    entry.mesh.material.texture = entry.atlas.texture;
+                    this._recomputeUvRects(entry);
+                    rect = entry.atlas.add(source);
+                }
+            }
+            if (rect === null) {
+                // 图集已达最大尺寸，新建图集与 Mesh
+                entry = this._createAtlasEntry();
+                this._atlasList.push(entry);
                 rect = entry.atlas.add(source);
             }
+            this._imageEntry.set(source, entry);
         }
-        if (rect === null) {
-            // 图集已达最大尺寸，新建图集与 Mesh
-            entry = this._createAtlasEntry();
-            this._atlasList.push(entry);
-            rect = entry.atlas.add(source);
-        }
+        const rect = entry.atlas.getRect(source);
         const uv = entry.atlas.getUvRect(rect);
         sprite.uvRect.set(uv[0], uv[1], uv[2], uv[3]);
         sprite.imageSize.set(source.width, source.height);
@@ -332,6 +346,21 @@ class InstancedSpriteCollection extends Object3D {
         for (const entry of this._atlasList) {
             entry.mesh.update();
         }
+    }
+    /**
+     * 释放所有 GPU 资源（几何体、材质、图集纹理），并移除所有子 Mesh
+     * @returns {InstancedSpriteCollection}
+    */
+    dispose() {
+        this.clear();
+        for (const entry of this._atlasList) {
+            entry.mesh.dispose();
+            entry.atlas.texture.dispose();
+        }
+        this._atlasList.length = 0;
+        this._imageEntry.clear();
+        super.clear();
+        return this;
     }
 };
 

@@ -99,7 +99,10 @@ class TextureAtlas {
         this.canvas = newCanvas;
         this.ctx = newCtx;
         this.size = newSize;
-        this.texture.image = this.canvas;
+
+        // 尺寸变化必须重建纹理：WebGL2 用 texStorage 分配固定尺寸，替换 image 后 texSubImage2D 无法扩容
+        this.texture.dispose();
+        this.texture = new CanvasTexture(this.canvas);
         this.texture.needsUpdate = true;
         return true;
     }
