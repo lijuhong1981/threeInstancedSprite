@@ -23,12 +23,12 @@
     "url": "git+https://github.com/lijuhong1981/threeInstancedSprite.git"
   },
   "keywords": [
-    "three",
-    "instanced",
-    "sprite",
-    "billboard",
+    "threejs",
     "webgl",
-    "webgpu"
+    "webgpu",
+    "instanced-rendering",
+    "sprite",
+    "billboard"
   ],
   "author": "",
   "license": "ISC",
