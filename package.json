@@ -24,6 +24,7 @@
   },
   "keywords": [
     "threejs",
+    "three",
     "webgl",
     "webgpu",
     "instanced-rendering",
