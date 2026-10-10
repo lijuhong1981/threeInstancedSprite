@@ -133,6 +133,12 @@ class InstancedSpriteMaterial extends ShaderMaterial {
         });
     }
     /**
+     * InstancedSpriteMaterial对象标识
+     * @type {boolean}
+     * @readonly
+    */
+    get isBillboardMaterial() { return true; }
+    /**
      * 图片纹理
      * @type {Texture}
     */

@@ -84,6 +84,7 @@ InstancedSprite 数据模型类，用于存储单个 InstancedSprite 的所有�
     * [.imageSize](#InstancedSprite+imageSize) : <code>Vector2</code>
     * [.userData](#InstancedSprite+userData) : <code>object</code>
     * [.isInstancedSprite](#InstancedSprite+isInstancedSprite) : <code>boolean</code>
+    * [.isBillboard](#InstancedSprite+isBillboard) : <code>boolean</code>
     * [.visible](#InstancedSprite+visible) : <code>boolean</code>
     * [.rotationDegrees](#InstancedSprite+rotationDegrees) : <code>number</code>
     * [.image](#InstancedSprite+image) : <code>string</code> \| <code>HTMLImageElement</code> \| <code>HTMLCanvasElement</code>
@@ -185,6 +186,13 @@ InstancedSprite 数据模型类，用于存储单个 InstancedSprite 的所有�
 
 ### instancedSprite.isInstancedSprite : <code>boolean</code>
 InstancedSprite对象标识
+
+**Kind**: instance property of [<code>InstancedSprite</code>](#InstancedSprite)  
+**Read only**: true  
+<a name="InstancedSprite+isBillboard"></a>
+
+### instancedSprite.isBillboard : <code>boolean</code>
+Billboard对象标识（InstancedSprite 的别名）
 
 **Kind**: instance property of [<code>InstancedSprite</code>](#InstancedSprite)  
 **Read only**: true  
@@ -297,6 +305,7 @@ InstancedSpriteCollection类，批量管理InstancedSprite实例
     * [.useNodeMaterial](#InstancedSpriteCollection+useNodeMaterial) : <code>boolean</code>
     * [.type](#InstancedSpriteCollection+type) : <code>string</code>
     * [.isInstancedSpriteCollection](#InstancedSpriteCollection+isInstancedSpriteCollection) : <code>boolean</code>
+    * [.isBillboardCollection](#InstancedSpriteCollection+isBillboardCollection) : <code>boolean</code>
     * [.depthTest](#InstancedSpriteCollection+depthTest) : <code>boolean</code>
     * [.depthWrite](#InstancedSpriteCollection+depthWrite) : <code>boolean</code>
     * [.instancedSprites](#InstancedSpriteCollection+instancedSprites) : [<code>Array.&lt;InstancedSprite&gt;</code>](#InstancedSprite)
@@ -343,6 +352,13 @@ InstancedSpriteCollection类，批量管理InstancedSprite实例
 
 ### instancedSpriteCollection.isInstancedSpriteCollection : <code>boolean</code>
 InstancedSpriteCollection对象标识
+
+**Kind**: instance property of [<code>InstancedSpriteCollection</code>](#InstancedSpriteCollection)  
+**Read only**: true  
+<a name="InstancedSpriteCollection+isBillboardCollection"></a>
+
+### instancedSpriteCollection.isBillboardCollection : <code>boolean</code>
+BillboardCollection对象标识（InstancedSpriteCollection 的别名）
 
 **Kind**: instance property of [<code>InstancedSpriteCollection</code>](#InstancedSpriteCollection)  
 **Read only**: true  
@@ -490,6 +506,18 @@ InstancedSprite 材质类，以attribute形式传入InstancedSprite对象实例�
 
 **Kind**: global class  
 **Extends**: <code>ShaderMaterial</code>  
+
+* [InstancedSpriteMaterial](#InstancedSpriteMaterial) ⇐ <code>ShaderMaterial</code>
+    * [.isBillboardMaterial](#InstancedSpriteMaterial+isBillboardMaterial) : <code>boolean</code>
+    * [.texture](#InstancedSpriteMaterial+texture) : <code>Texture</code>
+
+<a name="InstancedSpriteMaterial+isBillboardMaterial"></a>
+
+### instancedSpriteMaterial.isBillboardMaterial : <code>boolean</code>
+InstancedSpriteMaterial对象标识
+
+**Kind**: instance property of [<code>InstancedSpriteMaterial</code>](#InstancedSpriteMaterial)  
+**Read only**: true  
 <a name="InstancedSpriteMaterial+texture"></a>
 
 ### instancedSpriteMaterial.texture : <code>Texture</code>
@@ -520,6 +548,7 @@ InstancedSpriteMesh类，基于InstancedBufferGeometry实现的高性能Instance
     * [.type](#InstancedSpriteMesh+type) : <code>string</code>
     * [.frustumCulled](#InstancedSpriteMesh+frustumCulled) : <code>boolean</code>
     * [.isInstancedSpriteMesh](#InstancedSpriteMesh+isInstancedSpriteMesh) : <code>boolean</code>
+    * [.isBillboardMesh](#InstancedSpriteMesh+isBillboardMesh) : <code>boolean</code>
     * [.depthTest](#InstancedSpriteMesh+depthTest) : <code>boolean</code>
     * [.depthWrite](#InstancedSpriteMesh+depthWrite) : <code>boolean</code>
     * [.instancedSprites](#InstancedSpriteMesh+instancedSprites) : [<code>Array.&lt;InstancedSprite&gt;</code>](#InstancedSprite)
@@ -557,6 +586,13 @@ InstancedSpriteMesh类，基于InstancedBufferGeometry实现的高性能Instance
 
 ### instancedSpriteMesh.isInstancedSpriteMesh : <code>boolean</code>
 InstancedSpriteMesh对象标识
+
+**Kind**: instance property of [<code>InstancedSpriteMesh</code>](#InstancedSpriteMesh)  
+**Read only**: true  
+<a name="InstancedSpriteMesh+isBillboardMesh"></a>
+
+### instancedSpriteMesh.isBillboardMesh : <code>boolean</code>
+BillboardMesh对象标识（InstancedSpriteMesh 的别名）
 
 **Kind**: instance property of [<code>InstancedSpriteMesh</code>](#InstancedSpriteMesh)  
 **Read only**: true  
@@ -659,6 +695,18 @@ InstancedSpriteNodeMaterial 材质类，基于 Three.js TSL (Three Shading Langu
 
 **Kind**: global class  
 **Extends**: <code>NodeMaterial</code>  
+
+* [InstancedSpriteNodeMaterial](#InstancedSpriteNodeMaterial) ⇐ <code>NodeMaterial</code>
+    * [.isBillboardNodeMaterial](#InstancedSpriteNodeMaterial+isBillboardNodeMaterial) : <code>boolean</code>
+    * [.texture](#InstancedSpriteNodeMaterial+texture) : <code>Texture</code> \| <code>null</code>
+
+<a name="InstancedSpriteNodeMaterial+isBillboardNodeMaterial"></a>
+
+### instancedSpriteNodeMaterial.isBillboardNodeMaterial : <code>boolean</code>
+InstancedSpriteNodeMaterial对象标识
+
+**Kind**: instance property of [<code>InstancedSpriteNodeMaterial</code>](#InstancedSpriteNodeMaterial)  
+**Read only**: true  
 <a name="InstancedSpriteNodeMaterial+texture"></a>
 
 ### instancedSpriteNodeMaterial.texture : <code>Texture</code> \| <code>null</code>

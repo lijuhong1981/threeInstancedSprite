@@ -202,12 +202,18 @@ class InstancedSprite {
 
         this.setValues(options);
     }
-    /** 
+    /**
      * InstancedSprite对象标识
-     * @type {boolean} 
+     * @type {boolean}
      * @readonly
      */
     get isInstancedSprite() { return true; }
+    /**
+     * Billboard对象标识（InstancedSprite 的别名）
+     * @type {boolean}
+     * @readonly
+     */
+    get isBillboard() { return true; }
     /**
      * 设置参数
      * @param {InstancedSpriteOptions} options

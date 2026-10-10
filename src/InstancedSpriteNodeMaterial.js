@@ -149,6 +149,12 @@ class InstancedSpriteNodeMaterial extends NodeMaterial {
         }).once()();
     }
     /**
+     * InstancedSpriteNodeMaterial对象标识
+     * @type {boolean}
+     * @readonly
+    */
+    get isBillboardNodeMaterial() { return true; }
+    /**
      * 图片纹理
      * @type {Texture|null}
      */

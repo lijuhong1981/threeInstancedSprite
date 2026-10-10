@@ -313,6 +313,12 @@ class InstancedSpriteMesh extends Mesh {
     */
     get isInstancedSpriteMesh() { return true; }
     /**
+     * BillboardMesh对象标识（InstancedSpriteMesh 的别名）
+     * @type {boolean}
+     * @readonly
+    */
+    get isBillboardMesh() { return true; }
+    /**
      * 深度测试开关，默认为true，开启后会进行深度测试以正确处理遮挡关系，但可能会有性能影响；如果关闭则所有InstancedSprite都会被渲染在最前面，适合需要始终显示的UI元素等场景
      * @type {boolean}
      * @default true
