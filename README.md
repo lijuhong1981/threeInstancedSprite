@@ -10,6 +10,7 @@ Three.js 自带的 `Sprite` 不支持 GPU 实例化渲染。当场景中需要�
 - 🏷️ **纹理图集合批**：不同图片打包进同一图集，一个图集（一个 Mesh）一次 draw call；图集满自动新建
 - ✏️ **属性自动同步**：直接修改 Sprite 的 `position` / `rotation` / `scale` / `color` 等属性，每帧 `update()` 时通过脏检查自动上传至 GPU，无需手动刷新
 - 🎯 **射线拾取**：内置射线检测，可直接用 `Raycaster` 拾取到具体的 `InstancedSprite` 实例
+- 🎨 **GPU 拾取支持**：材质内置每实例拾取颜色（`pickColor`/`enablePickColor`）与深度编码模式（`enableDepth`），可配合 [@lijuhong1981/picking](https://www.npmjs.com/package/@lijuhong1981/picking) 做 GPU 颜色/深度拾取
 - 🖼️ **像素级透明**：片元着色器自动丢弃完全透明的像素
 - 🎨 **双渲染后端**：同时支持 WebGL（GLSL `ShaderMaterial`）与 WebGPU（TSL `NodeMaterial`）
 - 📏 **动态扩容**：实例缓冲区按需自动扩容，实例数量无硬性上限

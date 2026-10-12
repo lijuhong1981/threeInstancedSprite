@@ -510,6 +510,7 @@ InstancedSprite 材质类，以attribute形式传入InstancedSprite对象实例�
 * [InstancedSpriteMaterial](#InstancedSpriteMaterial) ⇐ <code>ShaderMaterial</code>
     * [.isBillboardMaterial](#InstancedSpriteMaterial+isBillboardMaterial) : <code>boolean</code>
     * [.texture](#InstancedSpriteMaterial+texture) : <code>Texture</code>
+    * [.enableDepth](#InstancedSpriteMaterial+enableDepth) : <code>boolean</code>
 
 <a name="InstancedSpriteMaterial+isBillboardMaterial"></a>
 
@@ -522,6 +523,12 @@ InstancedSpriteMaterial对象标识
 
 ### instancedSpriteMaterial.texture : <code>Texture</code>
 图片纹理
+
+**Kind**: instance property of [<code>InstancedSpriteMaterial</code>](#InstancedSpriteMaterial)  
+<a name="InstancedSpriteMaterial+enableDepth"></a>
+
+### instancedSpriteMaterial.enableDepth : <code>boolean</code>
+深度模式开关，用于GPU深度拾取，由Picking管理器设置和使用，用户无需关心
 
 **Kind**: instance property of [<code>InstancedSpriteMaterial</code>](#InstancedSpriteMaterial)  
 <a name="BillboardMaterial"></a>
@@ -699,6 +706,7 @@ InstancedSpriteNodeMaterial 材质类，基于 Three.js TSL (Three Shading Langu
 * [InstancedSpriteNodeMaterial](#InstancedSpriteNodeMaterial) ⇐ <code>NodeMaterial</code>
     * [.isBillboardNodeMaterial](#InstancedSpriteNodeMaterial+isBillboardNodeMaterial) : <code>boolean</code>
     * [.texture](#InstancedSpriteNodeMaterial+texture) : <code>Texture</code> \| <code>null</code>
+    * [.enableDepth](#InstancedSpriteNodeMaterial+enableDepth) : <code>boolean</code>
 
 <a name="InstancedSpriteNodeMaterial+isBillboardNodeMaterial"></a>
 
@@ -711,6 +719,12 @@ InstancedSpriteNodeMaterial对象标识
 
 ### instancedSpriteNodeMaterial.texture : <code>Texture</code> \| <code>null</code>
 图片纹理
+
+**Kind**: instance property of [<code>InstancedSpriteNodeMaterial</code>](#InstancedSpriteNodeMaterial)  
+<a name="InstancedSpriteNodeMaterial+enableDepth"></a>
+
+### instancedSpriteNodeMaterial.enableDepth : <code>boolean</code>
+深度模式开关，用于GPU深度拾取，由Picking管理器设置和使用，用户无需关心
 
 **Kind**: instance property of [<code>InstancedSpriteNodeMaterial</code>](#InstancedSpriteNodeMaterial)  
 <a name="BillboardNodeMaterial"></a>

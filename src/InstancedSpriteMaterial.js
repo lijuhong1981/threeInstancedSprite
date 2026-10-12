@@ -20,6 +20,7 @@ varying float vShow;
 varying vec2 vUv;
 varying vec4 vColorAndOpacity;
 varying vec4 vPickColorAndEnabled;
+varying vec2 vHighPrecisionZW;
 
 void main() {
     // --- 1. 提前解包属性（GPU会自动优化，无性能损失）---
@@ -72,6 +73,7 @@ void main() {
 
     // --- 9. 投影变换 ---
     gl_Position = projectionMatrix * mvPosition;
+    vHighPrecisionZW = gl_Position.zw;
 
     #include <logdepthbuf_vertex>
 }
@@ -79,6 +81,7 @@ void main() {
 
 const fragmentShader = `
 uniform sampler2D uTexture;
+uniform float enableDepth;
 
 #include <common>
 #include <logdepthbuf_pars_fragment>
@@ -87,6 +90,22 @@ varying float vShow;
 varying vec2 vUv;
 varying vec4 vColorAndOpacity;
 varying vec4 vPickColorAndEnabled;
+varying vec2 vHighPrecisionZW;
+
+const vec4 PackFactors = vec4( 1.0, 256.0, 256.0 * 256.0, 256.0 * 256.0 * 256.0 );
+const float ShiftRight8 = 1. / 256.;
+const float Inv255 = 1. / 255.;
+const float PackUpscale = 256. / 255.;
+
+vec4 packDepthToRGBA(const in float depth) {
+    if (depth <= 0.0) return vec4(0., 0., 0., 0.);
+    else if (depth >= 1.0) return vec4(1., 1., 1., 0.);
+
+    float vuf;
+    float bf = modf( depth * PackFactors.b, vuf );
+    float gf = modf( vuf * ShiftRight8, vuf );
+    return vec4( vuf * Inv255, gf * PackUpscale, bf, 1.0 );
+}
 
 void main() {
     if (vShow < 0.5) {
@@ -95,7 +114,11 @@ void main() {
 
     float enablePickColor = vPickColorAndEnabled.w;
 
-    if (enablePickColor > 0.5){
+    if (enableDepth > 0.5) {
+        float depth = vHighPrecisionZW[0] / vHighPrecisionZW[1];
+        depth = depth * 0.5 + 0.5;
+        gl_FragColor = packDepthToRGBA(depth);
+    } else if (enablePickColor > 0.5){
         gl_FragColor = vec4(vPickColorAndEnabled.xyz, 1.0);
     } else {
         vec4 texColor = texture2D(uTexture, vUv);
@@ -126,6 +149,7 @@ class InstancedSpriteMaterial extends ShaderMaterial {
             fragmentShader,
             uniforms: {
                 uTexture: { value: null },
+                enableDepth: { value: 0.0 },
             },
             transparent: true,
             depthTest: true,
@@ -147,6 +171,16 @@ class InstancedSpriteMaterial extends ShaderMaterial {
     }
     get texture() {
         return this.uniforms.uTexture.value;
+    }
+    /**
+     * 深度模式开关，用于GPU深度拾取，由Picking管理器设置和使用，用户无需关心
+     * @type {boolean}
+    */
+    set enableDepth(value) {
+        this.uniforms.enableDepth.value = value ? 1 : 0;
+    }
+    get enableDepth() {
+        return this.uniforms.enableDepth.value > 0.5;
     }
 };
 
