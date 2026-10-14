@@ -38,12 +38,15 @@
   },
   "homepage": "https://github.com/lijuhong1981/threeInstancedSprite#readme",
   "dependencies": {
-    "@lijuhong1981/jslibs": "^1.4.25",
-    "@lijuhong1981/three.utils": "^1.0.3",
+    "@lijuhong1981/jslibs": "^1.4.30",
+    "@lijuhong1981/three.utils": "^1.0.5"
+  },
+  "peerDependencies": {
     "three": ">=0.171.0"
   },
   "devDependencies": {
     "jsdoc-to-markdown": "^9.1.3",
+    "three": ">=0.171.0",
     "vite": "^8.3.3"
   }
 }
